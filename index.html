@@ -206,7 +206,10 @@
 
 <script>
 // パソコンで開いたときは、スマホで開き直せるQRを出す（線はスマホを傾けて合わせるため。2026-10-28 宮崎さん）
-if (!matchMedia('(pointer:coarse)').matches) document.getElementById('pcQr').classList.remove('hide');
+// スマホ・タブレット・ホーム画面のアプリとして開いたときは出さない（出しても読み取れないため。10/28 宮崎さん）
+const onPhone = /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+const asApp = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+if (!onPhone && !asApp && matchMedia('(pointer:fine)').matches) document.getElementById('pcQr').classList.remove('hide');
 
 // ════ 線をまっすぐにする（SVV＝主観的垂直・SVH＝主観的水平）
 // もとは ~/FNT-Apps/fnt-camera-check の「14. 線をまっすぐにする」（2026-10-15 宮崎さん）。2026-10-16 にこの1つだけを別アプリに切り出した。カメラは使わない。
