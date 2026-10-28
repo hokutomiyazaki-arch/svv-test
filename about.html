@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="SVV テスト（自覚的視性垂直位）・SVH（自覚的視性水平位）とは何か。何を見ているのか、正常の目安、傾く向きの読み方、このアプリのやり方と限界を、論文と教科書からまとめた解説。" />
+<title>SVV テストについて / Functional Neuro Training</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* 解説ページ。配色は index.html と同じ白（2026-10-16 宮崎さん：黒だと画面に顔が映り込むので白に） */
+  :root{ --bg:#fff; --bg1:#f6f6f7; --ink:#111113; --muted:#5f5f66; --line:rgba(0,0,0,.12); --card:rgba(0,0,0,.035); --red:#d32020; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"M PLUS Rounded 1c", system-ui, sans-serif; font-weight:500; color:var(--ink); background:var(--bg); line-height:1.9;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .wrap{ max-width:680px; margin:0 auto; padding:16px 20px 40px; }
+  .back{ display:inline-block; margin:6px 0 18px; padding:8px 16px; border-radius:12px; background:var(--card); border:1px solid var(--line); color:var(--ink); text-decoration:none; font-weight:700; font-size:14px; }
+  .kicker{ font-size:12px; letter-spacing:.2em; color:var(--red); font-weight:700; }
+  h1{ font-size:27px; font-weight:800; line-height:1.45; margin:6px 0 10px; }
+  .lead{ color:var(--muted); font-size:15px; }
+  h2{ font-size:20px; font-weight:800; margin:38px 0 12px; padding-top:18px; border-top:1px solid var(--line); }
+  h2 .no{ color:var(--red); margin-right:8px; }
+  h3{ font-size:16px; font-weight:800; margin:20px 0 6px; }
+  p{ margin:8px 0; font-size:15px; }
+  ul, ol{ margin:8px 0 8px 1.3em; font-size:15px; }
+  li{ margin:5px 0; }
+  b{ font-weight:800; }
+  .card{ margin:14px 0; padding:14px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); }
+  .key{ border-color:rgba(226,72,61,.55); }
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td{ text-align:left; vertical-align:top; padding:9px 8px; border-bottom:1px solid var(--line); }
+  th{ color:var(--muted); font-weight:700; font-size:12.5px; }
+  .src{ font-size:12px; color:var(--muted); line-height:1.7; margin-top:4px; }
+  .refs{ font-size:12.5px; color:var(--muted); line-height:1.75; }
+  .refs li{ margin:6px 0; }
+  .refs a{ color:#3a3a40; }
+  .note{ font-size:12px; color:var(--muted); }
+  footer{ margin-top:40px; padding-top:18px; border-top:1px solid var(--line); text-align:center; }
+  .med{ font-size:11.5px; color:var(--muted); line-height:1.75; text-align:left; }
+  .copy{ display:block; margin-top:14px; font-size:11px; letter-spacing:.14em; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← SVV テストへ戻る</a>
+  <div class="kicker">ABOUT THE TEST</div>
+  <h1>SVV テストとは</h1>
+  <p class="lead">「線をまっすぐ縦・まっすぐ横に合わせる」だけの検査で、何が分かるのか。論文と前庭リハビリの教科書から、要点をまとめました。</p>
+
+  <div class="card key">
+    <p><b>ひとことで言うと</b>：頭の中の「重力の向き（まっすぐ）」が、本当の重力からどれだけずれているかを測る検査です。ずれの向きは、重力を感じる耳の器官（耳石器）から脳までの道のどこが弱っていそうかの手がかりの一つになります（向きだけで場所は決まりません。4章）。</p>
+  </div>
+
+  <h2><span class="no">1</span>何を測る検査か</h2>
+  <p><b>SVV</b>（Subjective Visual Vertical＝自覚的視性垂直位）は、暗い所で光る線を「自分がまっすぐ縦だと感じる向き」に合わせてもらい、本当の垂直からのずれを角度で測ります。<b>SVH</b>（Subjective Visual Horizontal＝自覚的視性水平位）は、同じことを「まっすぐ横」で行います。</p>
+  <ul>
+    <li>健康な人は、真っ暗な部屋で頭を起こして座れば、線を本当の垂直・水平から <b>1° 以内</b>に合わせられます。<span class="src">（Vestibular Rehabilitation 12章 p.201）</span></li>
+  </ul>
+
+  <h2><span class="no">2</span>何の働きを見ているのか</h2>
+  <p>「まっすぐ」の感覚は、耳の奥の<b>耳石器</b>（重力と頭の傾きを感じる器官。<b>卵形嚢</b>と<b>球形嚢</b>の2つがある）と、三半規管（頭の回転を感じる3本の管）のうち縦向きの2本から来る情報を、脳がまとめて作っています。情報は次の道を通ります。</p>
+  <div class="card">
+    <p><b>耳（耳石器・三半規管）→ 前庭神経 → 脳幹の前庭神経核 → 視床 → 頭頂島前庭皮質</b>（前庭の情報をまとめる大脳の領域）</p>
+    <p class="src">（Dieterich & Brandt 2019・Glasauer ら 2018）</p>
+  </div>
+  <ul>
+    <li>この道のどこかが片側で弱ると、線が傾きやすくなります。教科書は SVV の傾きを、頭を左右に傾ける向き（ロール）で前庭の働きに左右差があることを示す<b>いちばん感度の高いサイン</b>（約90%に出る）としています。<span class="src">（Brandt & Dieterich 1994／Vestibular Rehabilitation 5章）</span></li>
+    <li>急性の脳幹の脳卒中111人のうち <b>94%</b> で SVV が傾いていました。<span class="src">（Dieterich & Brandt 1993）</span></li>
+    <li>耳石器の働きを臨床で見られる検査は、SVV・SVH と VEMP（前庭誘発筋電位）の2種類だけ、と教科書は書いています。<span class="src">（Vestibular Rehabilitation 12章 p.195）</span></li>
+  </ul>
+  <h3>縦は球形嚢、横は卵形嚢？</h3>
+  <ul>
+    <li>このアプリの判定画面は、<b>SVV＝球形嚢寄り</b>・<b>SVH＝卵形嚢寄り</b>として目安を出しています。</li>
+    <li>ただし、教科書（Vestibular Rehabilitation 11章 p.189）は「この検査で球形嚢か卵形嚢かを分けることはできない」と書き、論文には「SVV と SVH は左右の卵形嚢の差を反映しうる」というもの（Cheng ら 2022）もあります。</li>
+    <li>なので、<b>どちらの器官かは目安</b>として扱ってください。</li>
+  </ul>
+
+  <h2><span class="no">3</span>正常の目安</h2>
+  <table>
+    <tr><th>出典</th><th>正常／異常の目安</th></tr>
+    <tr><td>Vestibular Rehabilitation（11章・12章）</td><td>1° 以内（真っ暗な部屋）／±2° 以内／2.5° 以内、と章により幅がある</td></tr>
+    <tr><td>Böhmer & Mast 1999（装置）</td><td>0 ± 2°</td></tr>
+    <tr><td>Zwergal ら 2009（バケツ法）</td><td>健康な人のずれの平均は約 1°（片目 1.1 ± 0.7°・両目 0.9 ± 0.7°）</td></tr>
+    <tr><td>Ferreira ら 2016（バケツ法・100人）</td><td>90% の人が 2.6° まで、95% の人が 3.4° まで</td></tr>
+    <tr><td>Riera-Tur ら 2022（スマホを壁の回転盤に付ける方式）</td><td>病気を見分ける境目 2.43°</td></tr>
+    <tr><td>Takai ら 2006（SVH・健康な人23人）</td><td>SVH は 0.0 ± 1.1°</td></tr>
+  </table>
+  <p>SVV で「ここから異常」とする境目は、研究によって <b>2〜3° 程度のあいだ</b>でばらつきます。SVH は、健康な人で 0.0 ± 1.1° という報告（Takai ら 2006）はありますが、異常の境目をはっきり出した論文は、今回の検索では見つかりませんでした。このアプリは <b>SVV 2.5°・SVH 1.5°</b> を境目にしています。ただし、手に持つこのアプリの方式でこの境目が当てはまるかは確かめられていないので（6章）、判定は目安です。</p>
+  <p class="src">年齢で大きくなるという報告（van der Waal ら 2024）と、変わらないという報告（Zwergal 2009・Ferreira 2016）があり、結論は出ていません。</p>
+
+  <h2><span class="no">4</span>傾く向きの読み方</h2>
+  <h3>このアプリの判定の読み方</h3>
+  <ul>
+    <li><b>SVV</b>：線の<b>上の端</b>が、働きの落ちた耳石の側へ傾く。</li>
+    <li><b>SVH</b>：線の<b>下がった端</b>が、働きの落ちた側を指す。</li>
+  </ul>
+  <p>アプリの数字は、線が本人から見て<b>時計回り</b>に傾いたときに＋です（縦の線なら上の端が右へ、横の線なら右の端が下へ）。</p>
+  <p>この読み方は、耳（耳石）の側の問題を前提にしたもので、下の表の1行目（同じ側へ傾く）に当たります。脳幹の上のほうなどでは向きが逆になるので、アプリの「右・左」は<b>どちらの耳石かの目安</b>です。</p>
+  <h3>どこが弱ると、どちらへ傾くか（教科書・論文）</h3>
+  <table>
+    <tr><th>弱っている場所</th><th>線の傾く向き</th></tr>
+    <tr><td>耳（迷路・前庭神経）、延髄〜橋の下部（前庭神経核）</td><td><b>同じ側</b>へ</td></tr>
+    <tr><td>橋の上部〜中脳（内側縦束・カハール間質核）</td><td><b>反対側</b>へ</td></tr>
+    <tr><td>小脳</td><td>反対側が多い（約60%）。同じ側もある（約25%）</td></tr>
+    <tr><td>視床</td><td>中くらいの傾き。同じ側のことも反対側のこともある</td></tr>
+    <tr><td>頭頂島前庭皮質（大脳）</td><td>中くらいの傾き。多くは反対側</td></tr>
+  </table>
+  <p class="src">（Brandt & Dieterich 1994・Dieterich & Brandt 1993・Baier ら 2012／Vestibular Rehabilitation 5章）。左右の重力の経路が橋のあたりで交叉するため、その上と下で向きが逆になります。</p>
+  <ul>
+    <li>耳と延髄は同じ向き、その上は反対向きに傾くので、<b>傾く向きだけでは、どちらの側のどこが弱っているかは決められません</b>。教科書も、この検査だけでは耳（末梢）か脳（中枢）かは区別できない、としています。<span class="src">（Vestibular Rehabilitation 11章 p.190）</span></li>
+    <li>片目で見たときだけ傾き、両目では傾かないときは、脳幹の重力の道ではなく、眼を動かす神経（滑車神経・動眼神経）の麻痺によることが典型、とされます。<span class="src">（Brandt & Dieterich 1994）</span></li>
+  </ul>
+
+  <h2><span class="no">5</span>ずれの多くは時間とともに戻る</h2>
+  <ul>
+    <li>急性期のずれは大きく、前庭神経炎で約 7°、延髄外側の梗塞（ワレンベルグ症候群）で約 9.8°。どちらも<b>数日〜数週</b>で小さくなります。<span class="src">（Cnyrim ら 2007）</span></li>
+    <li>前庭神経炎の急性期には 20° を超えることもあり、ずれが大きいほど急性、と教科書は書いています。<span class="src">（Vestibular Rehabilitation 12章 p.205）</span></li>
+    <li>戻るのは主に<b>脳の代償</b>によるもので、耳そのものが治ったかどうかとは別です。前庭神経炎のあと、多くの人で SVV は3〜6か月で正常に戻ったのに、眼のねじれ（眼球回旋）はほぼ全員が1年後も正常範囲の外でした。著者らは、耳石の受容器は何か月も変わったままで、SVV と眼のねじれは一部しかつながっていない（戻る仕組みが別）と考えています。<span class="src">（Vestibular Rehabilitation 12章／Faralli ら 2021）</span></li>
+    <li>反対に、メニエール病の治療（ゲンタマイシンの鼓室内注入）で片側の前庭の働きを止めた6人のうち3人は、1年たっても SVH が正常範囲に戻りませんでした。<span class="src">（Takai ら 2006）</span></li>
+  </ul>
+
+  <h2><span class="no">6</span>測り方の移り変わり</h2>
+  <ol>
+    <li><b>暗室と光る棒</b>：本来の方法。周りの縦横の手がかりを完全に消します。</li>
+    <li><b>バケツ法</b>：不透明なバケツの底に線を描き、顔を入れて回してもらう方法。半球ドームの装置との一致は約9割、費用は5ドル未満。<span class="src">（Zwergal ら 2009）</span>正常な人と前庭に障害のある人を「かなりよく分ける」と教科書も紹介しています。<span class="src">（Vestibular Rehabilitation 17章）</span></li>
+    <li><b>スマホ</b>：スマホを壁の回転盤に付ける方式で、バケツ法より見つける力が高かった（87% 対 67%）という研究、同じ人の2回の測定がよくそろう（ICC＝一致度 0.95）という研究があります。<span class="src">（Riera-Tur ら 2022・2023）</span>VR ゴーグルにスマホを入れる方式もあります。<span class="src">（Umibe ら 2024・Ogihara ら 2025）</span></li>
+  </ol>
+  <div class="card">
+    <p><b>このアプリについて正直に</b>：このアプリは、手に持ったスマホを傾けて画面の線を合わせる方式です。<b>この方式そのものの精度を調べた研究は、まだ見つかっていません</b>（2026年10月時点の PubMed 検索）。暗室やバケツほど周りの手がかりを消せないので、正式な検査の代わりではなく、<b>同じ条件でくり返して比べる目安</b>として使ってください。</p>
+  </div>
+
+  <h2><span class="no">7</span>このアプリのやり方と、その理由</h2>
+  <table>
+    <tr><th>やり方</th><th>理由・出典</th></tr>
+    <tr><td>縦4回・横4回の平均</td><td>1回だけだとぶれるため。4回はこのアプリの決まり</td></tr>
+    <tr><td>始めの線を右・左へ交互に 12〜20° 傾けて出す</td><td>始めの線の位置で値が変わるため（van der Waal ら 2024）、右からと左からを半分ずつ行う</td></tr>
+    <tr><td>1回10秒、最後の1.5秒の傾きを読む</td><td>結果は時間切れのときに線がどこにあるかで決め、途中の行き過ぎは数えない。最後の一瞬だけだと手のぶれを拾うので、最後の1.5秒のまん中の値を読む。このアプリの決まり</td></tr>
+    <tr><td>10° 以上外れた回は平均から外す</td><td>合わせられなかった回（操作の失敗）が平均を引っぱらないように。このアプリの決まり。トレーニングで扱う小さなずれを前提にしているため、本当に 10° を超えてずれている人（5章の急性期など）は正しく測れない。外れる回が続くときは、スタッフ画面の「平均から外した回」を見る</td></tr>
+    <tr><td>暗い部屋で、画面を顔に近づける</td><td>壁や窓の縦横が見えると、それに頼ってしまうため（暗室・バケツに少しでも近づける）</td></tr>
+  </table>
+
+  <h2><span class="no">8</span>結果を変えてしまうもの</h2>
+  <ul>
+    <li><b>頭の傾き</b>：頭をまっすぐにすると平均 0.2° でも、頭を右に 30° 傾けると約 −9.6°、左に 30° で約 +7.2° ずれました（符号の決め方は研究ごとに違います）。<b>測るときは頭をまっすぐに</b>。<span class="src">（Wang ら 2021）</span></li>
+    <li><b>首や体の感覚</b>：耳石だけでなく、視覚や首・体の固有感覚（筋肉や関節から来る位置の感覚）も SVV に関わり、両側の前庭の働きが落ちた人ではその影響が強まっていました。<span class="src">（Toupet ら 2017）</span>片側の前庭に障害がある人（前庭神経鞘腫＝前庭神経にできる良性の腫瘍）で、首の後ろの筋肉に振動を当てると、異常なずれがさらに大きくなった報告もあります。<span class="src">（Kawase ら 2011）</span></li>
+    <li><b>周りの景色</b>：首の痛みが続く人では、枠が無ければ健康な人と差が無いのに、傾いた枠が見えると誤差の幅が広がりました。<span class="src">（Docherty ら 2012）</span></li>
+    <li><b>日による違い</b>：日を変えて測ると値がぶれます。VR 方式で「本当に変わった」と言える差は 2.67°、回転盤のスマホ方式では健康な人で 0.52°・患者で 1.36° でした。<span class="src">（Ogihara ら 2025・Riera-Tur ら 2023）</span></li>
+  </ul>
+
+  <h2><span class="no">9</span>トレーニングでの使い方</h2>
+  <p>トレーニングの現場での使い方です。効果を比べた研究は少ないので、見つかったものを最後に1つ紹介します。</p>
+  <ul>
+    <li><b>前後で比べる</b>：ドリルの前と後に、同じ条件（部屋の暗さ・持ち方・頭をまっすぐ）で測り、ずれが小さくなるかを見ます。日によるぶれ（8章）より大きな変化かどうかで読みます。</li>
+    <li><b>首の感覚の影響を見る</b>：首の筋肉への振動でずれが大きくなる報告があります（8章）。首まわりへの働きかけの前後で比べる材料になります。<span class="src">（Kawase ら 2011）</span></li>
+    <li><b>研究</b>：前庭神経炎の人に前庭リハビリの運動をした研究では、体の揺れの回復は早まったものの、SVV の戻り方は運動した群としない群で同じでした。<span class="src">（Strupp ら 1998）</span></li>
+  </ul>
+
+  <h2><span class="no">10</span>出典</h2>
+  <h3>論文（PubMed で確かめたもの）</h3>
+  <ol class="refs">
+    <li>Dieterich M, Brandt T. Perception of verticality and vestibular disorders of balance and falls. Front Neurol. 2019;10:172. <a href="https://pubmed.ncbi.nlm.nih.gov/31001184/" target="_blank" rel="noopener">PMID 31001184</a> ・ <a href="https://doi.org/10.3389/fneur.2019.00172" target="_blank" rel="noopener">DOI</a></li>
+    <li>Glasauer S, et al. Neuronal network-based mathematical modeling of perceived verticality in acute unilateral vestibular lesions: from nerve to thalamus and cortex. J Neurol. 2018;265(Suppl 1):101-112. <a href="https://pubmed.ncbi.nlm.nih.gov/29845378/" target="_blank" rel="noopener">PMID 29845378</a> ・ <a href="https://doi.org/10.1007/s00415-018-8909-5" target="_blank" rel="noopener">DOI</a></li>
+    <li>Brandt T, Dieterich M. Vestibular syndromes in the roll plane: topographic diagnosis from brainstem to cortex. Ann Neurol. 1994;36(3):337-47. <a href="https://pubmed.ncbi.nlm.nih.gov/8080241/" target="_blank" rel="noopener">PMID 8080241</a> ・ <a href="https://doi.org/10.1002/ana.410360304" target="_blank" rel="noopener">DOI</a></li>
+    <li>Dieterich M, Brandt T. Ocular torsion and tilt of subjective visual vertical are sensitive brainstem signs. Ann Neurol. 1993;33(3):292-9. <a href="https://pubmed.ncbi.nlm.nih.gov/8498813/" target="_blank" rel="noopener">PMID 8498813</a> ・ <a href="https://doi.org/10.1002/ana.410330311" target="_blank" rel="noopener">DOI</a></li>
+    <li>Dieterich M, Brandt T. Thalamic infarctions: differential effects on vestibular function in the roll plane (35 patients). Neurology. 1993;43(9):1732-40. <a href="https://pubmed.ncbi.nlm.nih.gov/8414023/" target="_blank" rel="noopener">PMID 8414023</a> ・ <a href="https://doi.org/10.1212/wnl.43.9.1732" target="_blank" rel="noopener">DOI</a></li>
+    <li>Brandt T, et al. Vestibular cortex lesions affect the perception of verticality. Ann Neurol. 1994;35(4):403-12. <a href="https://pubmed.ncbi.nlm.nih.gov/8154866/" target="_blank" rel="noopener">PMID 8154866</a> ・ <a href="https://doi.org/10.1002/ana.410350406" target="_blank" rel="noopener">DOI</a></li>
+    <li>Baier B, et al. A pathway in the brainstem for roll-tilt of the subjective visual vertical: evidence from a lesion-behavior mapping study. J Neurosci. 2012;32(43):14854-8. <a href="https://pubmed.ncbi.nlm.nih.gov/23100408/" target="_blank" rel="noopener">PMID 23100408</a> ・ <a href="https://doi.org/10.1523/JNEUROSCI.0770-12.2012" target="_blank" rel="noopener">DOI</a></li>
+    <li>Böhmer A, Mast F. Assessing otolith function by the subjective visual vertical. Ann N Y Acad Sci. 1999;871:221-31. <a href="https://pubmed.ncbi.nlm.nih.gov/10372074/" target="_blank" rel="noopener">PMID 10372074</a> ・ <a href="https://doi.org/10.1111/j.1749-6632.1999.tb09187.x" target="_blank" rel="noopener">DOI</a></li>
+    <li>Cheng Y, et al. Effect of age on virtual reality-assisted subjective visual vertical and subjective visual horizontal at different head-tilt angles. Braz J Otorhinolaryngol. 2022;88 Suppl 3:S139-S146. <a href="https://pubmed.ncbi.nlm.nih.gov/36319565/" target="_blank" rel="noopener">PMID 36319565</a> ・ <a href="https://doi.org/10.1016/j.bjorl.2022.10.001" target="_blank" rel="noopener">DOI</a></li>
+    <li>Zwergal A, et al. A bucket of static vestibular function. Neurology. 2009;72(19):1689-92. <a href="https://pubmed.ncbi.nlm.nih.gov/19433743/" target="_blank" rel="noopener">PMID 19433743</a> ・ <a href="https://doi.org/10.1212/WNL.0b013e3181a55ecf" target="_blank" rel="noopener">DOI</a></li>
+    <li>Ferreira MM, et al. Subjective visual vertical with the bucket method in Brazilian healthy individuals. Braz J Otorhinolaryngol. 2016;82(4):442-6. <a href="https://pubmed.ncbi.nlm.nih.gov/26895747/" target="_blank" rel="noopener">PMID 26895747</a> ・ <a href="https://doi.org/10.1016/j.bjorl.2015.08.027" target="_blank" rel="noopener">DOI</a></li>
+    <li>van der Waal C, et al. Clinical assessment of subjective visual and haptic vertical norms in healthy adults. Arch Clin Neuropsychol. 2024;39(8):1408-1417. <a href="https://pubmed.ncbi.nlm.nih.gov/38940374/" target="_blank" rel="noopener">PMID 38940374</a> ・ <a href="https://doi.org/10.1093/arclin/acae049" target="_blank" rel="noopener">DOI</a></li>
+    <li>Riera-Tur L, et al. Efficacy of the subjective visual vertical test performed using a mobile application to detect vestibular pathology. J Vestib Res. 2022;32(1):21-27. <a href="https://pubmed.ncbi.nlm.nih.gov/34180441/" target="_blank" rel="noopener">PMID 34180441</a> ・ <a href="https://doi.org/10.3233/VES-201526" target="_blank" rel="noopener">DOI</a></li>
+    <li>Riera-Tur L, et al. Test-retest of the Subjective Visual Vertical Test performed using a mobile application with the smartphone anchored to a turntable. Eur Arch Otorhinolaryngol. 2023;280(2):613-621. <a href="https://pubmed.ncbi.nlm.nih.gov/35838781/" target="_blank" rel="noopener">PMID 35838781</a> ・ <a href="https://doi.org/10.1007/s00405-022-07512-6" target="_blank" rel="noopener">DOI</a></li>
+    <li>Umibe A, et al. Development of a subjective visual vertical test system using a smartphone with virtual reality goggles for screening of otolithic dysfunction. JMIR Form Res. 2024;8:e53642. <a href="https://pubmed.ncbi.nlm.nih.gov/38833295/" target="_blank" rel="noopener">PMID 38833295</a> ・ <a href="https://doi.org/10.2196/53642" target="_blank" rel="noopener">DOI</a></li>
+    <li>Ogihara H, et al. Validity and reliability of the mobile virtual reality subjective visual vertical measurement system: comparison with conventional bucket test. J Vestib Res. 2025;35(6):313-319. <a href="https://pubmed.ncbi.nlm.nih.gov/40586560/" target="_blank" rel="noopener">PMID 40586560</a> ・ <a href="https://doi.org/10.1177/09574271251357176" target="_blank" rel="noopener">DOI</a></li>
+    <li>Cnyrim CD, et al. Central compensation of deviated subjective visual vertical in Wallenberg's syndrome. J Neurol Neurosurg Psychiatry. 2007;78(5):527-8. <a href="https://pubmed.ncbi.nlm.nih.gov/17435189/" target="_blank" rel="noopener">PMID 17435189</a> ・ <a href="https://doi.org/10.1136/jnnp.2006.100727" target="_blank" rel="noopener">DOI</a></li>
+    <li>Faralli M, et al. Different time course of compensation of subjective visual vertical and ocular torsion after acute unilateral vestibular lesion. Eur Arch Otorhinolaryngol. 2021;278(7):2269-2276. <a href="https://pubmed.ncbi.nlm.nih.gov/32876725/" target="_blank" rel="noopener">PMID 32876725</a> ・ <a href="https://doi.org/10.1007/s00405-020-06312-0" target="_blank" rel="noopener">DOI</a></li>
+    <li>Takai Y, et al. Recovery of subjective visual horizontal after unilateral vestibular deafferentation by intratympanic instillation of gentamicin. J Vestib Res. 2006;16(1-2):69-73. <a href="https://pubmed.ncbi.nlm.nih.gov/16917170/" target="_blank" rel="noopener">PMID 16917170</a></li>
+    <li>Strupp M, et al. Vestibular exercises improve central vestibulospinal compensation after vestibular neuritis. Neurology. 1998;51(3):838-44. <a href="https://pubmed.ncbi.nlm.nih.gov/9748036/" target="_blank" rel="noopener">PMID 9748036</a> ・ <a href="https://doi.org/10.1212/wnl.51.3.838" target="_blank" rel="noopener">DOI</a></li>
+    <li>Wang CH, et al. Test-retest reliability of subjective visual vertical measurements with lateral head tilt in virtual reality goggles. Tzu Chi Med J. 2021;33(3):294-300. <a href="https://pubmed.ncbi.nlm.nih.gov/34386369/" target="_blank" rel="noopener">PMID 34386369</a> ・ <a href="https://doi.org/10.4103/tcmj.tcmj_207_20" target="_blank" rel="noopener">DOI</a></li>
+    <li>Toupet M, et al. Subjective visual vertical in idiopathic bilateral vestibular hypofunction: enhanced role of vision, neck, and body proprioception. Otol Neurotol. 2017;38(7):1010-1016. <a href="https://pubmed.ncbi.nlm.nih.gov/28598949/" target="_blank" rel="noopener">PMID 28598949</a> ・ <a href="https://doi.org/10.1097/MAO.0000000000001462" target="_blank" rel="noopener">DOI</a></li>
+    <li>Kawase T, et al. Effects of neck muscle vibration on subjective visual vertical: comparative analysis with effects on nystagmus. Eur Arch Otorhinolaryngol. 2011;268(6):823-7. <a href="https://pubmed.ncbi.nlm.nih.gov/21181179/" target="_blank" rel="noopener">PMID 21181179</a> ・ <a href="https://doi.org/10.1007/s00405-010-1467-9" target="_blank" rel="noopener">DOI</a></li>
+    <li>Docherty S, et al. Perception of subjective visual vertical and horizontal in patients with chronic neck pain: a cross-sectional observational study. Man Ther. 2012;17(2):133-8. <a href="https://pubmed.ncbi.nlm.nih.gov/22182696/" target="_blank" rel="noopener">PMID 22182696</a> ・ <a href="https://doi.org/10.1016/j.math.2011.11.002" target="_blank" rel="noopener">DOI</a></li>
+  </ol>
+  <h3>教科書</h3>
+  <ul class="refs">
+    <li>Herdman SJ, Clendaniel RA (eds). <i>Vestibular Rehabilitation</i>. F.A. Davis. 5章（Brandt & Dieterich）・8章・11章・12章（Halmagyi ら）・17章・24章</li>
+  </ul>
+  <p class="note">論文は PubMed の要旨で確かめた内容です。</p>
+
+  <footer>
+    <p class="med">このアプリは体を整えるためのセルフチェックで、医療行為ではありません。診断や治療の代わりにはなりません。強いめまい・ふらつき・吐き気・急な聞こえの変化があるときは医療機関を受診してください。気分が悪くなったら、すぐにやめてください。</p>
+    <a class="back" href="./" style="margin-top:18px">← SVV テストへ戻る</a>
+    <span class="copy">© Functional Neuro Training / Legrandchariot</span>
+  </footer>
+</div>
+</body>
+</html>

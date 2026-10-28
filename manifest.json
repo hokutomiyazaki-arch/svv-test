@@ -1,0 +1,16 @@
+{
+  "name": "SVV テスト",
+  "short_name": "SVV テスト",
+  "description": "SVV・SVH（自覚的視性垂直位・水平位）。暗い画面の赤い線を、スマホを傾けて「まっすぐ縦」「まっすぐ横」に合わせるチェック。Functional Neuro Training。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ja",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

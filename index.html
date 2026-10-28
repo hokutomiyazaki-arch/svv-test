@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SVV テスト" />
+<meta name="description" content="白い画面の赤い線を、スマホを傾けて「まっすぐ縦」「まっすぐ横」に合わせるチェック（SVV・SVH）。Functional Neuro Training。" />
+<title>SVV テスト / Functional Neuro Training</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* 骨格は pinto-8（FNT 標準）に合わせる。配色は白（2026-10-16 宮崎さん：最初は黒にしたが「黒だと画面に顔などが映り込む」ので白に）。文字とボタンは黒、差し色は測る線と同じ赤 */
+  :root{ --bg0:#fff; --bg1:#f6f6f7; --bg2:#ececee; --accent:#111113; --accent2:#2c2c30; --accentInk:#fff; --red:#d32020;
+    --ink:#111113; --muted:#5f5f66; --line:rgba(0,0,0,.12); --card:rgba(0,0,0,.04); --danger:#c0392b; }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html,body{ overflow-x:hidden; max-width:100%; }
+  body{ font-family:"M PLUS Rounded 1c", system-ui, sans-serif; font-weight:700; color:var(--ink); line-height:1.7;
+    background:var(--bg0);
+    min-height:100vh; min-height:100dvh;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  body.playing{ overflow:hidden; touch-action:none; }
+  button{ font-family:inherit; font-weight:700; cursor:pointer; border:none; }
+  a{ color:var(--accent); }
+  :focus-visible{ outline:3px solid var(--accent); outline-offset:3px; border-radius:8px; }
+
+  #splash{ position:fixed; inset:0; z-index:1000; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:32px;
+    background:var(--bg0); transition:opacity .45s ease, visibility .45s ease; }
+  #splash.hide{ opacity:0; visibility:hidden; pointer-events:none; }
+  #splash img{ width:132px; height:132px; margin-bottom:22px; border-radius:26px; }
+  #splash .fnt{ font-size:13px; letter-spacing:.24em; color:var(--muted); margin-bottom:14px; }
+  #splash h1{ font-size:34px; font-weight:800; color:var(--ink); letter-spacing:.04em; margin-bottom:10px; }
+  #splash h1::after{ content:""; display:block; width:44px; height:3px; margin:12px auto 0; border-radius:2px; background:var(--red); }
+  #splash .aboutLink{ margin-top:16px; font-size:14px; color:var(--muted); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; }
+  #splash .lead{ font-size:14px; color:var(--muted); margin-bottom:30px; }
+  #splash .tapstart{ min-height:52px; padding:14px 34px; border-radius:16px; font-size:17px; font-weight:800; color:var(--accentInk);
+    background:linear-gradient(180deg,var(--accent),var(--accent2)); animation:breathe 2.4s ease-in-out infinite; }
+  #splash .copy{ position:absolute; bottom:calc(20px + env(safe-area-inset-bottom)); font-size:11px; color:var(--muted); }
+  @keyframes breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
+  .muteToggle{ margin-top:22px; min-height:40px; padding:8px 20px; border-radius:14px; font-size:13px; color:var(--accent); background:var(--card); border:1px solid var(--line); }
+  .muteToggle.off{ color:var(--muted); }
+
+  .app{ width:100%; max-width:480px; margin:0 auto; min-height:100vh; min-height:100dvh; display:flex; flex-direction:column; }
+  header{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px 4px; }
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo img{ width:34px; height:34px; }
+  .logo b{ font-size:15px; font-weight:800; }
+  .staffTag{ font-size:11px; color:var(--accentInk); background:var(--accent); border-radius:8px; padding:1px 8px; margin-left:4px; }
+  .menuBtn{ width:46px; height:46px; border-radius:12px; background:var(--card); color:var(--ink); font-size:22px; }
+  main{ flex:1; display:flex; flex-direction:column; padding:8px 20px 4px; }
+  .screen{ display:none; flex-direction:column; }
+  .screen.active{ display:flex; }
+  .step-label{ font-size:12px; letter-spacing:.16em; color:var(--red); margin-bottom:8px; }
+  h2{ font-size:23px; font-weight:800; line-height:1.5; margin-bottom:14px; }
+  .setupList{ list-style:none; margin:10px 0 18px; display:flex; flex-direction:column; gap:12px; }
+  .setupList li{ display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); font-size:15px; }
+  .setupList .no{ flex:none; width:26px; height:26px; border-radius:50%; background:var(--accent); color:var(--accentInk); font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; }
+  .btn{ width:100%; min-height:56px; border-radius:16px; font-size:18px; font-weight:800; color:var(--accentInk); background:linear-gradient(180deg,var(--accent),var(--accent2)); margin-top:10px; }
+  a.btn{ display:flex; align-items:center; justify-content:center; text-decoration:none; }
+  .btn.sub{ background:var(--card); color:var(--ink); border:1px solid var(--line); font-size:16px; min-height:50px; }
+  .msg{ margin:12px 0; padding:14px 16px; border-radius:14px; background:rgba(192,57,43,.07); border:1px solid var(--danger); font-size:15px; display:none; }
+  .msg.show{ display:block; }
+  .res{ margin:10px 0; padding:14px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); font-size:15px; line-height:1.8; }
+  .res.judge{ border-color:var(--accent2); }
+  .small{ font-size:12px; color:var(--muted); font-weight:500; line-height:1.7; display:inline-block; margin-top:6px; }
+  .done{ font-size:22px; font-weight:800; text-align:center; margin:30px 0 10px; }
+  textarea{ width:100%; height:120px; margin-top:8px; border-radius:12px; background:#f4f4f5; color:var(--ink); border:1px solid var(--line); padding:10px; font-size:12px; font-family:ui-monospace,monospace; }
+
+  /* 測る画面：真っ白に赤い線だけ（黒だと画面に顔が映り込むので白。2026-10-16 宮崎さん） */
+  #svv{ position:fixed; inset:0; display:none; z-index:300; background:#fff; }
+  #svv canvas{ position:absolute; inset:0; width:100%; height:100%; }
+  #svvMsg{ position:absolute; left:50%; top:18%; transform:translateX(-50%); width:min(92vw,520px); text-align:center; font-weight:800; font-size:clamp(22px,6vw,30px); line-height:1.45; color:#222; }
+  #svvMsg small{ display:block; font-size:15px; font-weight:600; color:#666; margin-top:6px; }
+  #svvStop{ position:absolute; right:calc(14px + env(safe-area-inset-right)); bottom:calc(14px + env(safe-area-inset-bottom)); padding:8px 14px; border-radius:10px; background:#f2f2f3; color:#888; font-size:13px; border:1px solid #e2e2e4; }
+
+  /* 首の傾きチェック：前のカメラで顔を映す（SVV の前にやる。2026-10-24） */
+  #tilt{ position:fixed; inset:0; display:none; z-index:310; background:#000; }
+  #tilt video{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transform:scaleX(-1); }
+  #tiltO{ position:absolute; inset:0; width:100%; height:100%; }
+  #tiltBtns{ position:absolute; left:50%; bottom:calc(64px + env(safe-area-inset-bottom)); transform:translateX(-50%); width:min(86vw,420px); }
+  #tiltBtns button{ display:block; width:100%; margin:6px 0; font:inherit; font-size:18px; font-weight:800; padding:15px; border-radius:999px; border:0; background:#fff; color:#111; }
+  #tiltBtns button.sub{ background:transparent; color:#fff; border:1px solid rgba(255,255,255,.5); }
+  #tiltBtns button:disabled{ opacity:.4; }
+  #tiltMsg{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:min(92vw,520px); text-align:center; font-weight:800; font-size:clamp(22px,6vw,30px); line-height:1.45; color:#fff; padding:14px 16px; border-radius:18px; background:rgba(0,0,0,.6); }
+  #tiltMsg:empty{ display:none; }
+  #tiltMsg.low{ top:22%; }
+  #tilt:has(#tiltMsg.res){ background:#111; }
+  #tiltMsg.res{ top:38%; }
+  #tiltMsg small{ display:block; font-size:15px; font-weight:600; color:#ddd; margin-top:6px; }
+  #tiltStop{ position:absolute; right:calc(14px + env(safe-area-inset-right)); bottom:calc(14px + env(safe-area-inset-bottom)); padding:8px 14px; border-radius:10px; background:rgba(0,0,0,.55); color:#ddd; font-size:13px; border:1px solid rgba(255,255,255,.3); }
+
+  footer{ padding:20px 20px calc(20px + env(safe-area-inset-bottom)); text-align:center; }
+  .med{ font-size:11.5px; color:var(--muted); line-height:1.75; }
+  .fnt-copy{ display:block; margin-top:14px; font-size:11px; letter-spacing:.14em; color:var(--muted); opacity:.8; }
+
+  .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.55); opacity:0; visibility:hidden; transition:opacity .3s ease, visibility .3s ease; z-index:80; }
+  .overlay.open{ opacity:1; visibility:visible; }
+  .side{ position:fixed; top:0; right:0; height:100%; width:min(84%,340px); z-index:90; background:var(--bg1); border-left:1px solid var(--line);
+    transform:translateX(100%); transition:transform .3s ease; display:flex; flex-direction:column;
+    padding:calc(16px + env(safe-area-inset-top)) 20px calc(20px + env(safe-area-inset-bottom)); overflow-y:auto; }
+  .side.open{ transform:translateX(0); }
+  .side .top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .side .top b{ font-size:16px; font-weight:800; }
+  .side .closeBtn{ width:44px; height:44px; border-radius:12px; background:var(--card); color:var(--ink); font-size:20px; }
+  .side h4{ font-size:12px; letter-spacing:.14em; color:var(--red); margin:18px 0 10px; }
+  .side a.sideBtn{ display:flex; align-items:center; justify-content:center; text-decoration:none; }
+  .side .box{ font-size:13px; color:var(--muted); line-height:1.95; }
+  .side .box ol{ padding-left:20px; }
+  .side .sideBtn{ width:100%; min-height:46px; border-radius:12px; background:var(--card); color:var(--ink); border:1px solid var(--line); font-size:14px; margin-top:8px; }
+  .side .learn{ margin-top:auto; padding-top:22px; }
+  .side .learn a{ font-size:14px; text-decoration:none; display:block; padding:12px 0; }
+  .side .side-copy{ font-size:10.5px; letter-spacing:.1em; color:var(--muted); opacity:.7; margin-top:14px; display:block; }
+  .hide{ display:none !important; }
+  #pcQr{ margin:14px auto 4px; max-width:300px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:14px; font-size:15px; line-height:1.6; }
+  #pcQr img{ display:block; width:180px; height:180px; margin:8px auto; }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
+</style>
+</head>
+<body>
+
+<div id="splash" role="dialog" aria-label="SVV テストを開始">
+  <img src="FNT512.png" alt="FNT ロゴ" />
+  <div class="fnt">FUNCTIONAL NEURO TRAINING</div>
+  <h1>SVV テスト</h1>
+  <p class="lead">白い画面の赤い線を、まっすぐ縦・まっすぐ横に。</p>
+  <div id="pcQr" class="hide"><b>このテストはスマホで行います</b><br>スマホのカメラでこのコードを読み取ると、スマホで開けます<img src="qr.svg" alt="SVV テストを開くQRコード"></div>
+  <button class="tapstart" id="tapStart">タップで開始</button>
+  <button class="muteToggle" id="muteSplash" type="button">🔊 音声オン</button>
+  <a class="aboutLink" href="about.html">このテストについて（意味・読み方・出典）</a>
+  <div class="copy">© Functional Neuro Training / Legrandchariot</div>
+</div>
+
+<div class="app" id="app" aria-hidden="true">
+  <header>
+    <div class="logo"><img src="FNT512-transparent.png" alt="" /><b>SVV テスト</b><span class="staffTag hide" id="staffTag">スタッフ</span></div>
+    <button class="menuBtn" id="menuBtn" aria-label="メニューを開く">☰</button>
+  </header>
+  <main>
+    <section class="screen" id="s1">
+      <div class="step-label">線をまっすぐにする</div>
+      <h2>赤い線を<br>まっすぐ縦・まっすぐ横に</h2>
+      <ul class="setupList">
+        <li><span class="no">1</span><span>部屋を<b>暗く</b>できれば暗くする</span></li>
+        <li><span class="no">2</span><span>スマホを<b>縦に</b>持って、<b>顔にできるだけ近づける</b>（画面で見える範囲がほぼ埋まるくらい・鼻から10〜15cm）</span></li>
+        <li><span class="no">3</span><span>赤い線が出たら、スマホを<b>傾けて</b>線を合わせ、そのまま止める（1回10秒）</span></li>
+        <li><span class="no">4</span><span>縦を4回、横を4回。全部で約2分</span></li>
+      </ul>
+      <div class="msg" id="msg"></div>
+      <button class="btn" id="bTiltGo">首の傾きチェック → SVV</button>
+      <p class="small">はじめに前のカメラで5秒、楽にした姿勢のまま画面を見て、ふだんの首の傾き（目じりを結んだ線）を測ります。続けて SVV に進みます</p>
+      <button class="btn sub" id="bGo">SVV だけ始める</button>
+      <button class="btn sub" id="bTrain">トレーニングモード</button>
+      <p class="small">トレーニングモード：1回10秒のうち後半5秒に、正しい縦・横の線が薄く出ます。自分の「まっすぐ」とのずれを見て覚える練習です（結果は見本が出る前の値）</p>
+      <a class="btn sub" href="about.html">このテストについて</a>
+    </section>
+
+    <section class="screen" id="s2">
+      <div id="endCust" class="done">結果</div>
+      <div id="endCustNote"></div>
+      <div id="endStaff" class="hide"></div>
+      <button class="btn" id="bAgain">もう一度やる</button>
+    </section>
+  </main>
+  <footer>
+    <p class="med">このアプリは体を整えるためのセルフチェックで、医療行為ではありません。診断や治療の代わりにはなりません。強いめまい・ふらつき・吐き気・急な聞こえの変化があるときは医療機関を受診してください。気分が悪くなったら、すぐにやめてください。</p>
+    <span class="fnt-copy">© Functional Neuro Training / Legrandchariot</span>
+  </footer>
+</div>
+
+<div id="svv"><canvas id="svvC"></canvas><div id="svvMsg"></div><button id="svvStop">やめる</button></div>
+<div id="tilt"><video id="tiltV" playsinline muted autoplay></video><canvas id="tiltO"></canvas><div id="tiltMsg"></div><div id="tiltBtns"></div><button id="tiltStop">やめる</button></div>
+
+<div class="overlay" id="overlay"></div>
+<nav class="side" id="side" aria-label="メニュー" aria-hidden="true">
+  <div class="top"><b>メニュー</b><button class="closeBtn" id="closeMenu" aria-label="メニューを閉じる">×</button></div>
+  <h4>このテストについて</h4>
+  <a class="sideBtn" href="about.html">意味・読み方・出典を見る</a>
+  <a class="sideBtn" href="pro.html">プロの方へ：お客さんでどう読むか</a>
+  <h4>音声</h4>
+  <button class="sideBtn" id="muteSide">🔊 音声オン</button>
+  <h4>やり方</h4>
+  <div class="box"><ol>
+    <li>白い画面に赤い線が1本、斜めに出ます</li>
+    <li>スマホを傾けて、線が「まっすぐ縦」（あとで「まっすぐ横」）に見えるところで止めます</li>
+    <li>10秒たつと「ピッ」と鳴って次の線に変わります</li>
+  </ol><p>トレーニングモードでは、後半5秒に正しい縦・横の線が薄く出ます。</p><p>周りの壁や窓の縦横が見えると、それに頼ってしまいます。暗い部屋で、画面を顔に近づけてやるのがおすすめです。</p></div>
+  <h4>ホーム画面に追加すると使いやすい</h4>
+  <div class="box"><ol><li>共有ボタン（□から↑のマーク）を押す</li><li>「ホーム画面に追加」を選ぶ</li></ol></div>
+  <div id="staffSide" class="hide">
+    <h4>スタッフ用</h4>
+    <button class="sideBtn" id="bCopyAll">この端末の記録を全部コピー</button>
+    <div class="box" id="runCount"></div>
+  </div>
+  <div class="learn">
+    <a href="https://bodydiscovery.info/owned-optin" target="_blank" rel="noopener">もっと学びたい人へ → https://bodydiscovery.info/owned-optin</a>
+    <span class="side-copy">© Functional Neuro Training / Legrandchariot</span>
+  </div>
+</nav>
+
+<script>
+// パソコンで開いたときは、スマホで開き直せるQRを出す（線はスマホを傾けて合わせるため。2026-10-28 宮崎さん）
+if (!matchMedia('(pointer:coarse)').matches) document.getElementById('pcQr').classList.remove('hide');
+
+// ════ 線をまっすぐにする（SVV＝主観的垂直・SVH＝主観的水平）
+// もとは ~/FNT-Apps/fnt-camera-check の「14. 線をまっすぐにする」（2026-10-15 宮崎さん）。2026-10-16 にこの1つだけを別アプリに切り出した。カメラは使わない。
+// 白い画面に赤い線を1本、傾けて出す。本人はスマホを傾けて、線を「まっすぐ縦」（SVV）・「まっすぐ横」（SVH）に合わせて止める。
+// 線は画面に対して固定（バケツの内側の線と同じ）。止まったときの線の、重力に対する傾き＝画面上の線の角度＋スマホの傾き（加速度で重力の向きを取る）。
+// 縦4回・横4回。始めは右・左へ交互に 12〜20° 傾けておく（右からと左からを半分ずつ。始めの位置で値が変わる：van der Waal 2024）。
+// 読み：平均のずれが SVV 2.5° 以上・SVH 1.5° 以上で異常。
+//   SVV は線の上の端が、SVH は下がった端が、働きの落ちた耳石の側を向く。どちらも「時計回り（＋）＝本人の右」。
+//   SVV は球形嚢寄り・SVH は卵形嚢寄りとして目安を出す。ただし本（Vestibular Rehabilitation 印刷頁189）は「どちらかは特定できない」。
+//   中枢なら：延髄・橋（上部の橋より下）は同じ側、小脳・中脳より上は反対側へ傾くことが多い（Vestibular Rehabilitation 印刷頁190）。
+// 本来は暗室かバケツで、周りの縦横の手がかりを消す。スマホの画面だけでは消し切れないので、仮の代わり。部屋を暗くし、画面を顔に近づけてもらう
+// 1回は10秒決め打ちで、残りの秒数を出す。読むのは最後の1.5秒の傾き（2026-10-15 宮崎さん「何秒やればいいかわからない。合わせる時間は10秒ぐらい」「何回もやって平均値」）。
+// 結果はその場で出す（2026-10-16 宮崎さん「担当者からお伝えするのではなく、その場で出して」）：縦・横の平均のずれ・目安の範囲か・傾いた向き。
+// トレーニングモード（2026-10-16 宮崎さん「トレーニングモードの最中では、正確な垂直線と水平線が薄く、後半5秒の時に出るように」）：
+//   1回10秒のうち後半5秒に、重力に対して本当の縦・横の線を薄い灰色で重ねる（スマホを傾けても常に本当の縦・横を指す＝画面上の角度は −スマホの傾き）。
+//   後半は見本に合わせられてしまうので、ずれは見本が出る直前の1.5秒（3.5〜5秒）で読む＝自力の「まっすぐ」の値
+// ?staff=1 ではさらに、1回ごとの値・どちらの耳石かの読み・記録のコピーを出す
+// 首の傾きチェック（2026-10-24 宮崎さん「首の固有感覚テストの中にある首の傾きチェックを SVV のテストのところにも追加」「首の傾き度合いをチェックしてから SVV のテストができるように」）：
+//   「首の傾きチェック → SVV」で、SVV の前に前のカメラで5秒測る。測り方は ~/FNT-Apps/hanasaki-awase の「③ ふだんの首の傾き」と同じ（あちらを直したら、ここにも移す）。
+//   カメラを使うのはこの5秒だけで、SVV に入る前に手放す（SVV はこれまでどおりカメラなし）
+const $ = id => document.getElementById(id);
+const STAFF = /[?&]staff\b/.test(location.search);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const mean = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : NaN;
+const med = a => { if (!a.length) return NaN; const v = [...a].sort((x, y) => x - y), n = v.length >> 1; return v.length % 2 ? v[n] : (v[n - 1] + v[n]) / 2; };
+const sd = a => { const m = mean(a); return Math.sqrt(mean(a.map(x => (x - m) ** 2))); };
+const r1 = v => Number.isFinite(v) ? Math.round(v * 10) / 10 : null;
+let tok = 0, RUN = null, TRAIN = false;
+
+// ── 音声：ElevenLabs で前もって作った音声（voice/）を流す。無い文だけ端末の声で読む（もとのアプリと同じ）。文を足したら tools/voice_build.py を走らせる
+let VOICE = localStorage.getItem('fntVoice') !== 'off', said = '', jaV = null, VMAP = null;
+const VA = new Audio();
+const vkey = t => t.replace(/[\s。]/g, '');
+fetch('voice/index.json', { cache: 'no-cache' }).then(r => r.json()).then(m => { VMAP = m; preload(); }).catch(() => {});
+// 音声は Web Audio で鳴らす（2026-10-16 宮崎さん「Android で開いたんだけれども、音鳴らないよ。音声の案内も何もない」）。
+// <audio> は、さわった直後でないと鳴らさない端末がある（カメラでチェックはカメラを使っている間は許されるので鳴っていた。こちらはカメラを使わない）。
+// Web Audio は、さわった瞬間に一度起こせば、あとはいつでも鳴る。音声は前もって全部読み込んでおく。起きていないときだけ <audio> に落とす
+const BUF = {}; let SRC = null;
+function preload() {
+  if (!AC || !VMAP) return;
+  for (const f of new Set(Object.values(VMAP))) if (!BUF[f]) { BUF[f] = 'loading';
+    fetch('voice/' + f).then(r => r.arrayBuffer()).then(a => new Promise((ok, ng) => AC.decodeAudioData(a, ok, ng))).then(b => { BUF[f] = b; }).catch(() => { delete BUF[f]; }); }
+}
+function vstop() { try { SRC && SRC.stop(); } catch (e) {} SRC = null; VA.pause(); }
+const toSpeech = html => { const d = document.createElement('div'); d.innerHTML = String(html).replace(/<br\s*\/?>/g, '。').replace(/<small>/g, '。');
+  return d.textContent.replace(/\s+/g, ' ').replace(/。+/g, '。').replace(/^。|。$/g, '').trim(); };
+let vPend = null;
+function vplay(src) {
+  vPend = null; vstop();
+  const b = BUF[src.replace('voice/', '')];
+  if (AC && AC.state === 'running' && b && b !== 'loading') { try { SRC = AC.createBufferSource(); SRC.buffer = b; SRC.connect(AC.destination); SRC.start(0); return; } catch (e) {} }
+  VA.muted = false; VA.src = src; VA.play().catch(e => { if (e && e.name === 'NotAllowedError') vPend = src; });
+}
+function say(html) {
+  const t = html ? toSpeech(html) : ''; if (!t || t === said) return; said = t;
+  if (!VOICE) return;
+  const f = VMAP && VMAP[vkey(t)];
+  if (f) { try { speechSynthesis.cancel(); } catch (e) {} vplay('voice/' + f); return; }
+  if (STAFF) console.log('[voice] 音声ファイルなし：' + t);
+  tts(t);
+}
+function tts(t) {   // 端末の声で読む
+  if (!window.speechSynthesis || !t) return;
+  vstop();
+  try { speechSynthesis.cancel(); const x = new SpeechSynthesisUtterance(t); x.lang = 'ja-JP'; x.rate = 1.1;
+    jaV = jaV || speechSynthesis.getVoices().find(v => /^ja/i.test(v.lang)); if (jaV) x.voice = jaV; speechSynthesis.speak(x); } catch (e) {}
+}
+VA.addEventListener('error', () => { if (VOICE && said && !/unlock/.test(VA.src)) tts(said); });   // 音声ファイルが読めなかったときは、黙らずに端末の声で読む
+// スマホは、押した瞬間の外で鳴らそうとすると断られることがある。鳴らせなかった文は次にさわったときに鳴らす
+let AC = null;
+// マナーモードでも鳴らす（iPhone は既定だと Web Audio の「ピッ」が消音スイッチで消える。iOS 17 以降の Safari が持つ設定）
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+function acUnlock() {   // 「ピッ」の音の部品は、さわった瞬間の中で作って起こしておく（後で作ると iPhone では鳴らない）
+  try { const A = window.AudioContext || window.webkitAudioContext; if (!A) return; AC = AC || new A(); if (AC.state !== 'running') AC.resume();
+    const b = AC.createBuffer(1, 1, 22050), s = AC.createBufferSource(); s.buffer = b; s.connect(AC.destination); s.start(0); preload(); } catch (e) {}
+  try { if (!acUnlock.tts && window.speechSynthesis) { acUnlock.tts = 1; speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } } catch (e) {}   // 端末の声も、最初はさわった瞬間に起こす
+}
+['pointerdown', 'touchend', 'click'].forEach(k => addEventListener(k, () => {
+  acUnlock();
+  if (vPend && VOICE) { const s = vPend; vPend = null; VA.src = s; VA.play().catch(() => {}); }
+}, true));
+function beep(f = 660, ms = 80) {   // 1回おわりの合図
+  try { const A = window.AudioContext || window.webkitAudioContext; AC = AC || new A(); const o = AC.createOscillator(), g = AC.createGain();
+    o.frequency.value = f; g.gain.value = 0.2; o.connect(g); g.connect(AC.destination); o.start(); o.stop(AC.currentTime + ms / 1000); } catch (e) {}
+}
+function muteUI() { for (const id of ['muteSplash', 'muteSide']) { const b = $(id); b.textContent = VOICE ? '🔊 音声オン' : '🔇 音声オフ'; b.classList.toggle('off', !VOICE); } }
+function toggleVoice(e) { e.stopPropagation(); VOICE = !VOICE; localStorage.setItem('fntVoice', VOICE ? 'on' : 'off'); muteUI(); if (!VOICE) { try { speechSynthesis.cancel(); } catch (_) {} vstop(); } }
+$('muteSplash').onclick = toggleVoice; $('muteSide').onclick = toggleVoice; muteUI();
+
+// ── スマホの傾き（加速度の重力の向き）。iPhone は押したボタンの中で許可を取る
+let MOT = null, motOn = false;
+async function motionStart() {   // 戻り値：'ok'／'denied'（許可が出ない）／'none'（センサーが無い）
+  if (motOn) return 'ok';
+  try { if (typeof DeviceMotionEvent === 'undefined') return 'none'; if (typeof DeviceMotionEvent.requestPermission === 'function' && (await DeviceMotionEvent.requestPermission()) !== 'granted') return 'denied'; } catch (e) { return 'denied'; }
+  addEventListener('devicemotion', e => {
+    const g = e.accelerationIncludingGravity; if (!g || !Number.isFinite(g.x) || !Number.isFinite(g.y)) return;
+    // 端末の軸の重力を、いまの画面の向きの軸に回す。iPad は横持ちが多いので、縦・横どちらの持ち方でも測る（2026-10-16 宮崎さん「iPadだと読み取れない」）
+    const a = scrAngle() * Math.PI / 180, sx = g.x * Math.cos(a) - g.y * Math.sin(a), sy = g.x * Math.sin(a) + g.y * Math.cos(a);
+    // roll：向きつきの傾き（＋＝本人から見て時計回り＝画面の上が右へ）。iPhone と Android は重力の符号が逆なので、画面の縦の成分の符号でそろえる。
+    // 寝かせすぎ（画面の縦の成分が 1.5 未満＝ほぼ平置き）だけ読まない。以前は 3 で、iPad を後ろへ倒して持つと読めなかった
+    const sg = sy >= 0 ? 1 : -1, roll = Math.abs(sy) < 1.5 ? null : Math.atan2(-sx * sg, sy * sg) * 180 / Math.PI;
+    MOT = { t: performance.now(), roll, flat: Math.abs(sy) < 1.5 };
+  });
+  motOn = true; return 'ok';
+}
+function scrAngle() { const o = screen.orientation && Number.isFinite(screen.orientation.angle) ? screen.orientation.angle : (window.orientation || 0); return ((o % 360) + 360) % 360; }
+const phoneRoll = () => MOT && MOT.roll != null && performance.now() - MOT.t < 1000 ? MOT.roll : null;
+window.__setRoll = r => { motOn = true; MOT = { t: performance.now(), roll: r }; };   // 確かめ用（自動の試験で、スマホの傾きを入れる）
+
+// ── 画面の明かりを消さない
+let wake = null;
+async function wakeOn() { try { wake = await navigator.wakeLock.request('screen'); } catch (e) {} }
+function wakeOff() { try { wake && wake.release(); } catch (e) {} wake = null; }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && document.body.classList.contains('playing')) wakeOn(); });
+
+// ── 首の傾きチェック（元：hanasaki-awase「③ ふだんの首の傾き」。顔の点は MediaPipe。映像は端末の外へ送らない）
+// 🔴 2026-10-24 夜 宮崎さん「『顔が見つからなかった』と出る。今までのアプリで使用していた仕組みをそのまま入れるんだよ。新しく作っちゃダメ」。
+//    最初の版は自前で書き直していて、GPU で顔の点が取れない端末で CPU に切り替える部分（元の 2026-10-14 の直し）や、顔の点を映して確かめる画面が抜けていた。
+//    いまは hanasaki-awase の load・startCam・frameCanvas・fitOverlay・loop・frame・stepTilt をそのまま写してある（あちらを直したら、ここにも移す）。
+//    違うのは、この画面の部品の名前（tiltV・tiltO・tiltMsg・tiltBtns）と、スマホの傾きを SVV の傾きのセンサー（phoneRoll の大きさ）から取ることだけ
+const TILT_TH = 3;   // 度（仮。元のアプリと同じ）
+const WASM = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.0/wasm';
+const MODEL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+const video = $('tiltV'), ov = $('tiltO'), oc = ov.getContext('2d');
+let lm = null, last = null, lastT = -1, rec = null;   // last = 直近の顔の点（画素）
+// ── 顔の点の番号（右・左は本人から見た向き。起動後に実際の位置で確かめて入れ替える）
+let P = { eyeOut: [33, 263], eyeIn: [133, 362], mouth: [61, 291], brow: [105, 334], lidUp: [159, 386], lidDn: [145, 374], iris: [468, 473], cheek: [234, 454] };
+let sideChecked = false;
+// GPU で顔の点が取れない端末がある（Android の Chrome で、顔が映っていても点が出なかった）。取れない・エラーが続いたら CPU に切り替える
+let delegate = '', toCPU = async () => {}, switching = false, gpuMiss = 0, lmReady = null;
+async function load() {
+  const { FilesetResolver, FaceLandmarker } = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.0/vision_bundle.mjs');
+  const fs = await FilesetResolver.forVisionTasks(WASM);
+  const opt = d => ({ baseOptions: { modelAssetPath: MODEL, delegate: d }, runningMode: 'VIDEO', numFaces: 1, outputFaceBlendshapes: true, outputFacialTransformationMatrixes: true });
+  try { lm = await FaceLandmarker.createFromOptions(fs, opt('GPU')); delegate = 'GPU'; }
+  catch (e) { lm = await FaceLandmarker.createFromOptions(fs, opt('CPU')); delegate = 'CPU'; }
+  toCPU = async () => { if (delegate === 'CPU' || switching) return; switching = true; try { lm = await FaceLandmarker.createFromOptions(fs, opt('CPU')); delegate = 'CPU'; } finally { switching = false; } };
+}
+const loadFace = () => lmReady || (lmReady = load().catch(e => { lmReady = null; window.__loadError = e.message; throw e; }));
+loadFace().catch(() => {});   // 元のアプリと同じく、開いたときから読み込んでおく（押してから読むと待たされる）
+function px(l) { return { x: l.x * video.videoWidth, y: l.y * video.videoHeight }; }
+const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+// 目の線を水平に回して、目の間の長さを1にした座標（顔の傾き・カメラとの距離に左右されない）。
+// x は「本人の右 → 本人の左」が＋（写っている映像のまま。鏡にしていない）
+function frame(pts, E = P.eyeOut) {
+  const a = pts[E[0]], b = pts[E[1]];
+  const c = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, d = dist(a, b);
+  let ang = Math.atan2(b.y - a.y, b.x - a.x);
+  if (ang > Math.PI / 2) ang -= Math.PI; else if (ang < -Math.PI / 2) ang += Math.PI;
+  const cs = Math.cos(-ang), sn = Math.sin(-ang);
+  const f = p => { const x = p.x - c.x, y = p.y - c.y; return { x: (x * cs - y * sn) / d, y: (x * sn + y * cs) / d }; };
+  const ci = Math.cos(ang), si = Math.sin(ang);
+  const inv = q => ({ x: c.x + (q.x * ci - q.y * si) * d, y: c.y + (q.x * si + q.y * ci) * d });
+  return { f, inv, d, ang, c };
+}
+// ── カメラ（元の startCam・releaseCam。画面を離れたらすぐ手放す）
+let camWanted = false, looping = false;
+async function startCam() {
+  camWanted = true;
+  if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; }
+  const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 60 } }, audio: false });
+  video.srcObject = s;
+  await video.play();
+  if (!looping) { looping = true; loop(); }
+}
+function releaseCam() { if (video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; } }
+function camStop() { camWanted = false; releaseCam(); last = null; oc.setTransform(1, 0, 0, 1, 0, 0); oc.clearRect(0, 0, ov.width, ov.height); }   // 止めたら顔の点も消す
+addEventListener('pagehide', releaseCam);
+// 顔の読み取りには、映像をいったん映像と同じ大きさのキャンバスに写してから渡す（元：Android の Chrome で video をそのまま渡すと点がずれた）
+const detC = document.createElement('canvas'), detX = detC.getContext('2d');
+function frameCanvas() {
+  const w = video.videoWidth, h = video.videoHeight;
+  if (detC.width !== w || detC.height !== h) { detC.width = w; detC.height = h; }
+  detX.drawImage(video, 0, 0, w, h);
+  return detC;
+}
+let OVU = 1;
+function fitOverlay() {
+  const W = ov.clientWidth, H = ov.clientHeight, r = window.devicePixelRatio || 1, vw = video.videoWidth, vh = video.videoHeight;
+  const cw = Math.round(W * r), ch = Math.round(H * r);
+  if (ov.width !== cw || ov.height !== ch) { ov.width = cw; ov.height = ch; }
+  oc.setTransform(1, 0, 0, 1, 0, 0); oc.clearRect(0, 0, cw, ch);
+  if (!vw || !vh || !W || !H) return;
+  const k = Math.min(W / vw, H / vh), ox = (W - vw * k) / 2, oy = (H - vh * k) / 2;
+  oc.setTransform(-k * r, 0, 0, k * r, (ox + vw * k) * r, oy * r);
+  OVU = 1 / k;
+}
+function loop() {
+  if (!camWanted) { looping = false; last = null; return; }
+  if (lm && video.readyState >= 2 && video.currentTime !== lastT) {
+    lastT = video.currentTime;
+    const t = performance.now();
+    let r = null;
+    if (!switching) { try { r = lm.detectForVideo(frameCanvas(), t); } catch (e) { window.__detErr = e.message; toCPU(); } }
+    const got = !!(r && r.faceLandmarks && r.faceLandmarks[0]);
+    gpuMiss = got ? 0 : gpuMiss + 1;
+    if (delegate === 'GPU' && gpuMiss > 45) toCPU();   // GPU で約3秒続けて顔が取れなければ、CPU に切り替える（一度だけ）
+    window.__delegate = delegate;
+    fitOverlay();
+    if (got) {
+      const pts = r.faceLandmarks[0].map(px);
+      if (!sideChecked) {   // 写っている映像（鏡にしていない）では、本人の右は画面の左＝x が小さい
+        if (pts[33].x > pts[263].x) for (const k in P) P[k] = [P[k][1], P[k][0]];
+        sideChecked = true;
+      }
+      last = pts; window.__last = pts;
+      const u = OVU;   // 顔の点を映して、読めていることを本人が見て分かるようにする（元と同じ）
+      oc.fillStyle = 'rgba(90,209,139,.9)';
+      for (let i = 0; i < pts.length; i += 2) oc.fillRect(pts[i].x - 1.3 * u, pts[i].y - 1.3 * u, 2.6 * u, 2.6 * u);
+      oc.fillStyle = '#ffcc00';   // 黒目と鼻先の黄色い丸（元と同じ。2026-10-24 夜 宮崎さん「目と鼻の位置が認識されている印も出ていない」＝写したときに落としていた）
+      for (const i of [...P.iris, 1]) { oc.beginPath(); oc.arc(pts[i].x, pts[i].y, 3.5 * u, 0, 7); oc.fill(); }
+      if (rec) rec.push({ t, pts });
+    } else last = null;
+    window.__frames = (window.__frames || 0) + 1;
+    window.__faceSeen = (window.__faceSeen || 0) + (last ? 1 : 0);
+  }
+  requestAnimationFrame(loop);
+}
+document.addEventListener('visibilitychange', () => { if (document.hidden && camWanted) { tok++; camStop(); tiltShow(false); } });   // 画面を離れたらカメラを手放す
+const phoneDeg = () => { const r = phoneRoll(); return r == null ? null : Math.abs(r); };   // 元の phoneDeg と同じ（左右の傾きの大きさ・向きは見ない）
+async function record(ms, each, my) { const t0 = performance.now(); rec = []; while (my === tok && performance.now() - t0 < ms) { if (each) each(); await sleep(50); } const r = rec || []; rec = null; return r; }
+const tiltWord = d => d == null || !Number.isFinite(d) ? '—' : Math.abs(d) < 0.5 ? 'ほぼまっすぐ' : `${d > 0 ? '右' : '左'}へ ${Math.abs(d).toFixed(1)}°`;
+function tiltShow(on) { $('tilt').style.display = on ? 'block' : 'none'; document.body.classList.toggle('playing', on); on ? wakeOn() : wakeOff(); if (!on) { tiltMsg(''); $('tiltBtns').innerHTML = ''; } }
+function tiltMsg(html, cls, voice) { const m = $('tiltMsg'); m.innerHTML = html; m.className = cls || ''; if (html && voice !== false) say(voice ?? html); }
+const tiltBtn = (label, cls) => new Promise(res => { const b = document.createElement('button'); b.textContent = label; b.className = cls || ''; b.onclick = () => { $('tiltBtns').innerHTML = ''; res(); }; $('tiltBtns').appendChild(b); });
+const bc = document.createElement('canvas'), bx = bc.getContext('2d', { willReadFrequently: true });
+function brightness() {
+  bc.width = 32; bc.height = 24; bx.drawImage(video, 0, 0, 32, 24);
+  const d = bx.getImageData(8, 4, 16, 16).data; let s = 0;
+  for (let i = 0; i < d.length; i += 4) s += 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+  return s / (d.length / 4);
+}
+// 0. 位置合わせ（元の stepAlign のまま。顔が映っているか・距離・向き・明るさを確かめてから③に入る）
+async function tiltAlign(my) {
+  let go = false; const mk = (label, cls) => { const b = document.createElement('button'); b.textContent = label; b.className = cls || ''; b.onclick = () => { go = true; }; $('tiltBtns').appendChild(b); return b; };
+  $('tiltBtns').innerHTML = '';
+  const b = mk('次へ'); b.disabled = true;
+  const skip = mk('このまま進む', 'sub'); skip.style.display = 'none';
+  const t0 = performance.now();
+  let okCount = 0, unlocked = false;
+  while (my === tok && !go) {
+    const items = [];
+    if (!last) items.push(['顔が見つかりません。カメラに顔を向けてください', false]);
+    else {
+      const { d, f, ang } = frame(last), w = video.videoWidth;
+      const nose = last[1], cl = last[P.cheek[0]], cr = last[P.cheek[1]];
+      const yaw = (f(nose).x - f(cl).x) / (f(cr).x - f(cl).x);   // 0.5 で正面。傾きを戻した座標で取る
+      const roll = Math.abs(ang * 180 / Math.PI), size = d / w;
+      items.push([size < 0.10 ? 'もう少し近づいて' : size > 0.50 ? 'もう少し離れて' : '距離：ちょうどいい', size >= 0.10 && size <= 0.50]);
+      const yOk = Math.abs(yaw - 0.5) <= 0.12, rOk = roll <= 12;
+      items.push([yOk && rOk ? '向き：まっすぐ' : !yOk ? '顔をまっすぐ正面に' : '首のかしげをまっすぐに', yOk && rOk]);
+      const br = brightness();
+      items.push([br < 45 ? '暗いです。明るい所へ' : '明るさ：OK', br >= 45]);
+    }
+    const all = items.length === 3 && items.every(i => i[1]);
+    okCount = all ? okCount + 1 : Math.max(0, okCount - 1);
+    if (okCount >= 5) unlocked = true;                          // 一度そろえば、次へは押せたままにする
+    b.disabled = !unlocked;
+    skip.style.display = !unlocked && last && performance.now() - t0 > 5000 ? '' : 'none';   // 顔が写っていないときは出さない
+    const head = all || unlocked ? '<span style="color:#5ad18b">OK ✓</span><br>下の「次へ」を押してください' : '顔の位置を合わせます';
+    tiltMsg(`${head}<small>${items.map(([t, ok]) => `<span style="color:${ok ? '#5ad18b' : '#ff8a65'}">${ok ? '●' : '○'} ${t}</span>`).join('<br>')}</small>`, 'low', all || unlocked ? 'OK。下の「次へ」を押してください' : '顔の位置を合わせます。' + items.filter(i => !i[1]).map(i => i[0]).join('。'));
+    await sleep(150);
+  }
+  $('tiltBtns').innerHTML = '';
+}
+async function tiltCheck(my) {   // 戻り値：測った値／{ err }／null（やめた）
+  tiltShow(true); tiltMsg('カメラを準備しています…', '', false);
+  try { await loadFace(); if (my !== tok) return null; await startCam(); }
+  catch (e) { camStop(); tiltShow(false); return { err: `カメラを使えませんでした（${e.name || e.message}）。カメラを許可するか、「SVV だけ始める」で進めてください` }; }
+  try {
+    await tiltAlign(my); if (my !== tok) return null;
+    let why = '';
+    for (;;) {   // 元の stepTilt：「始める」→ 顔を待つ → スマホをまっすぐ → 5秒。顔が取れなければ「もう一度」
+      tiltMsg(why ? `${why}<small>顔を画面に入れて、もう一度どうぞ${STAFF ? `<br>確かめ用：顔の点の読み取り ${delegate}・${window.__faceSeen || 0}／${window.__frames || 0}コマ${window.__detErr ? '・' + window.__detErr : ''}` : ''}</small>` : '<b>楽にして</b><br>画面を見るだけ<small>スマホは縦にまっすぐ</small>', 'low', why ? `${why}<small>顔を画面に入れて、もう一度どうぞ</small>` : undefined);
+      await tiltBtn(why ? 'もう一度' : '始める'); if (my !== tok) return null;
+      let w0 = performance.now(); while (my === tok && !last && performance.now() - w0 < 5000) await sleep(100);
+      if (my !== tok) return null;
+      if (!last) { why = '顔が見つかりませんでした'; continue; }
+      const t1 = performance.now(); let okN = 0;   // スマホがまっすぐになるまで待つ（測れない端末・8秒たったら、そのまま進む）
+      while (my === tok && performance.now() - t1 < 8000) { const p = phoneDeg(); if (p == null && performance.now() - t1 > 1500) break;
+        okN = p != null && p <= 2 ? okN + 1 : 0; if (okN >= 5) break;
+        tiltMsg(`スマホを<br>まっすぐ縦に<small>${p != null ? `スマホの傾き ${p.toFixed(1)}°（2°以内に）` : ''}</small>`, '', 'スマホをまっすぐ縦に'); await sleep(150); }
+      if (my !== tok) return null;
+      tiltMsg('楽にしたまま<br>画面を見ていてください', 'low');
+      const ph = [], r = await record(5000, () => { const p = phoneDeg(); if (p != null) ph.push(p); }, my);
+      if (my !== tok) return null;
+      if (r.length < 15) { why = '顔が見えている時間が短すぎました'; continue; }
+      // frame().ang は 本人の右目→左目 の線の向き。右目が下がる（本人の右へ傾く）と負になるので、符号を返して ＋＝右へ
+      const ang = r.map(({ pts }) => -frame(pts).ang * 180 / Math.PI);
+      const mo = r.map(({ pts }) => { const a = pts[P.mouth[0]], b = pts[P.mouth[1]]; return -Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI; });
+      const deg = med(ang), phone = ph.length ? med(ph) : null, note = []; let over = null;
+      if (Math.abs(deg) >= TILT_TH) {
+        if (phone != null && phone >= Math.abs(deg) - 1) note.push(`スマホの傾き ${phone.toFixed(1)}° と区別できないので読まない`);
+        else over = deg > 0 ? '右' : '左';
+      }
+      if (phone == null) note.push('スマホの傾きは測れていない（この端末・ブラウザでは取れない）');
+      beep(660, 80);
+      const T = { deg: r1(deg), sd: r1(sd(ang)), mouthDeg: r1(med(mo)), phone: r1(phone), over, note: note.join('／') || null, threshold: TILT_TH, n: r.length, delegate };
+      // 測ったらすぐ結果を見せる（元の③も測り終えたら結果を出す。2026-10-24 夜 宮崎さん「傾きの結果が首のテストの後に出ない」）。カメラはここで手放し、「SVV へ進む」で SVV に入る
+      camStop();
+      tiltMsg(`<span style="font-size:.8em">首の傾き（目じりを結んだ線）</span><br>${tiltWord(T.deg)}<small>${T.over ? `<b style="color:#ff8a65">${T.over}へ ${Math.abs(T.deg).toFixed(1)}° 傾いています</b>（${TILT_TH}°以上）` : `${TILT_TH}°より小さい傾きです`}<br>ぶれ ±${T.sd}°・口角の線 ${tiltWord(T.mouthDeg)}・スマホの傾き ${T.phone != null ? T.phone + '°' : '—'}${T.note ? '<br>※' + T.note : ''}</small>`, 'res', false);
+      let again = false; const ag = document.createElement('button'); ag.textContent = 'もう一度測る'; ag.className = 'sub'; ag.onclick = () => { again = true; };
+      const go = tiltBtn('SVV へ進む'); $('tiltBtns').appendChild(ag);
+      await Promise.race([go, new Promise(res => { ag.addEventListener('click', res); })]); $('tiltBtns').innerHTML = '';
+      if (my !== tok) return null;
+      if (again) { why = ''; tiltMsg('カメラを準備しています…', '', false); await startCam(); await tiltAlign(my); if (my !== tok) return null; continue; }
+      return T;
+    }
+  } finally { rec = null; camStop(); if (my === tok) tiltShow(false); }
+}
+const tiltLine = T => !T ? '' : `<div class="res"><b>首の傾き</b>（目じりを結んだ線）：<b>${tiltWord(T.deg)}</b><br>${T.over ? `<b style="color:var(--red)">${T.over}へ ${Math.abs(T.deg).toFixed(1)}° 傾いています</b>（${TILT_TH}°以上）` : `${TILT_TH}°より小さい傾きです`}<br><span class="small">ぶれ ±${T.sd}°・口角の線 ${tiltWord(T.mouthDeg)}・スマホの傾き ${T.phone != null ? T.phone + '°' : '—'}${T.note ? '<br>※' + T.note : ''}<br>目安：${TILT_TH}°以上を「傾きあり」とする（仮）。右・左は本人から見た向き</span></div>`;
+
+// ── 線と測る画面
+const SVV_BIG = 5;   // ずれがとても大きい（度）。医療機関をすすめる（2026-10-28 宮崎さん：アンケートのプレゼントにするので「急なめまい・大きなズレの人へ医療機関へ」を出す。急性の前庭神経炎で約7°・延髄外側の梗塞で約9.8°＝about.html 5章。健康な人は95%が3.4°まで＝Ferreira 2016。5° はアプリの決まり）
+const SVV_TH = 2.5, SVH_TH = 1.5, SVV_N = 4, SVV_SEC = 10, SVV_TAIL = 1500, SVV_OFF = 10, GUIDE_AT = 5000, SVV_SD = 3;   // 度・回数・1回の秒数・読む長さ(ms)・合わせられていないとみて平均から外すずれ(度)・測り直しを出すばらつき(度)
+// 測り直し（2026-10-24 宮崎さん「ズレの範囲は大きく出ている気がする」→「測り直しと出す仕組みを追加して」）：1回ごとの値のばらつき（標準偏差）が SVV_SD を超えるか、合わせられた回が3回未満なら、平均はあてにならないので測り直しを出す。
+//   手持ちだとスマホと一緒に頭が傾く・始めの傾きとスマホの縁につられる、で1回ごとの値が揺れ、4回の平均では片側へのずれに見えてしまうため。3° は仮の値（講習で使って見直す）
+function svvShow(on) { $('svv').style.display = on ? 'block' : 'none'; document.body.classList.toggle('playing', on); on ? wakeOn() : wakeOff(); if (!on) svvMsg(''); }
+function svvMsg(html) { $('svvMsg').innerHTML = html; if (html) say(html); }
+function svvLine(kind, deg, guide) {   // deg：画面に対する線の傾き（＋＝時計回り）／guide：見本（本当の縦・横）の画面に対する角度。無ければ出さない
+  const c = $('svvC'), w = c.clientWidth, h = c.clientHeight, x = c.getContext('2d'), k = devicePixelRatio || 1;
+  c.width = w * k; c.height = h * k; x.setTransform(k, 0, 0, k, 0, 0); x.clearRect(0, 0, w, h);
+  document.body.dataset.svv = kind ? kind + ' ' + deg : '';   // 確かめ用（自動の試験で、いま出ている線の向きを読む）
+  if (!kind) return;
+  const L = Math.hypot(w, h) / 2 + 10;   // 画面の端から端まで貫く（2026-10-15 宮崎さん）
+  x.translate(w / 2, h / 2);
+  if (guide != null) {   // 見本は赤い線の下に、薄い灰色で
+    x.save(); x.rotate(guide * Math.PI / 180); x.strokeStyle = 'rgba(0,0,0,.2)'; x.lineWidth = 3; x.beginPath();
+    if (kind === 'V') { x.moveTo(0, -L); x.lineTo(0, L); } else { x.moveTo(-L, 0); x.lineTo(L, 0); }
+    x.stroke(); x.restore();
+  }
+  x.rotate(deg * Math.PI / 180);
+  x.strokeStyle = '#d32020'; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath();
+  if (kind === 'V') { x.moveTo(0, -L); x.lineTo(0, L); } else { x.moveTo(-L, 0); x.lineTo(L, 0); }
+  x.stroke();
+}
+async function svvTrial(p, my, train) {
+  // 線の傾きは「いまのスマホの傾き」を差し引いて決める＝重力に対して毎回 p.start だけ傾いて出る（前の回でスマホが傾いたままでも、毎回 12〜20° 動かして合わせる）
+  const t0 = performance.now(), r0 = phoneRoll() ?? 0, th = p.start - r0, S = [];
+  svvLine(p.kind, th);
+  let shown = -1;
+  while (my === tok && performance.now() - t0 < SVV_SEC * 1000) {
+    const now = performance.now(), r = phoneRoll(), left = Math.ceil(SVV_SEC - (now - t0) / 1000);
+    if (left !== shown) { $('svvMsg').innerHTML = `<span style="font-size:44px">${left}</span><small>顔に近づけたまま。合わせたら、そのまま止める</small>`; shown = left; }   // 秒数は読み上げない（毎秒しゃべると邪魔になる）
+    if (r != null) S.push({ t: now, r });
+    if (train && now - t0 >= GUIDE_AT) svvLine(p.kind, th, r != null ? -r : null);   // 後半5秒：本当の縦・横を薄く重ねる（スマホの傾きに合わせて毎回描き直す）
+    await sleep(30);
+  }
+  $('svvMsg').innerHTML = '';
+  const now = performance.now(), w = train ? S.filter(o => o.t - t0 >= GUIDE_AT - SVV_TAIL && o.t - t0 < GUIDE_AT) : S.filter(o => now - o.t <= SVV_TAIL), roll = med(w.map(o => o.r));   // トレーニングは見本が出る前の1.5秒
+  if (w.length < 5 || !Number.isFinite(roll)) return { kind: p.kind, ok: false, start: r1(p.start) };
+  const err = th + roll;
+  return { kind: p.kind, ok: true, start: r1(p.start), err: r1(err), roll: r1(roll), off: Math.abs(err) > SVV_OFF, sway: r1(Math.max(...w.map(o => o.r)) - Math.min(...w.map(o => o.r))) };   // off：合わせられていない回／sway：最後の1.5秒の揺れ幅
+}
+function note(t) { const m = $('msg'); m.textContent = t || ''; m.classList.toggle('show', !!t); if (t) say(t); }
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === id)); scrollTo(0, 0); }
+
+let WITH_TILT = false;
+const btnsOff = d => { $('bGo').disabled = $('bTrain').disabled = $('bTiltGo').disabled = d; };
+async function stepSvv(train, withTilt) {
+  const my = ++tok; note(''); TRAIN = !!train; WITH_TILT = !!withTilt && !train;
+  btnsOff(true);
+  try {
+    VA.muted = false; VA.src = 'voice/unlock.mp3'; VA.play().catch(() => {});   // 押したときに一度鳴らしておかないと、後で音が出ない端末がある
+    note('傾きのセンサーを準備しています…');   // 押したことがすぐ分かるように（2026-10-16 宮崎さん「ボタン押してもなかなかスタートしない」）
+    const st = await motionStart();
+    if (st === 'denied') return note('傾きを読む許可が出ていません。Safari のタブを閉じて開き直し、「始める」→「許可」を押してください');
+    if (st === 'none') return note('この端末には傾きのセンサーがありません');
+    const w0 = performance.now(); while (my === tok && phoneRoll() == null && performance.now() - w0 < 4000) await sleep(100);
+    if (my !== tok) return;
+    if (phoneRoll() == null) return note(MOT && MOT.flat ? '端末を寝かせすぎています。画面を顔に向けて立てて持ってください' : 'この端末では傾きを読み取れませんでした');
+    note('');
+    let tilt = null;
+    if (WITH_TILT) { tilt = await tiltCheck(my); if (my !== tok || !tilt) return; if (tilt.err) return note(tilt.err); await sleep(600); if (my !== tok) return; }
+    RUN = { started: new Date().toISOString(), ua: navigator.userAgent, mode: TRAIN ? 'train' : 'test', tilt };
+    const plan = [];   // 縦4・横4。始めの傾きは右・左を交互に（最初の向きはばらばら）、大きさは 12〜20° でばらばら
+    for (const kind of ['V', 'H']) { const s0 = Math.random() < 0.5 ? 1 : -1; for (let i = 0; i < SVV_N; i++) plan.push({ kind, start: (i % 2 ? -s0 : s0) * (12 + Math.random() * 8) }); }
+    svvShow(true); const T = [];
+    // 2026-10-16 宮崎さん「最初にスマホを顔に近づけさせて、視界の多くがスマホの画面で覆われるように、できるだけ近めで計測」：
+    // 周りの縦横（壁・窓）が見えると、それに頼って線を合わせてしまう。線を出す前に近づけてもらう（カメラは使わないので、5秒数えて待つ）
+    const NEAR = 'スマホを<b>顔に近づけて</b><small>画面で見える範囲がほぼ埋まるくらい</small>'; svvMsg(NEAR);   // 読み上げは1回だけ（数字は読まない）
+    for (let k = 5; k >= 1; k--) { $('svvMsg').innerHTML = NEAR + `<span style="font-size:44px">${k}</span>`; await sleep(1000); if (my !== tok) return; }
+    svvMsg('');
+    for (let i = 0; i < plan.length; i++) {
+      const p = plan[i];
+      if (i === 0 || plan[i - 1].kind !== p.kind) { svvLine(null); svvMsg(p.kind === 'V' ? '線を<b>まっすぐ縦</b>に<small>スマホを傾けて合わせ、止める。1回10秒</small>' : '次は<b>まっすぐ横</b>に<small>スマホを傾けて合わせ、止める。1回10秒</small>'); await sleep(3000); if (my !== tok) return; svvMsg(''); }
+      T.push(await svvTrial(p, my, TRAIN)); if (my !== tok) return;
+      beep(660, 80); svvLine(null); await sleep(800);
+    }
+    svvShow(false); analyzeSvv(T);
+  } finally { if (my === tok) btnsOff(false); }
+}
+function analyzeSvv(T) {
+  const one = (kind, th) => { const a = T.filter(t => t.kind === kind && t.ok && !t.off);   // 平均は、合わせられた回（ずれ10°以内）だけで出す
+    if (a.length < 2) return { ok: false, n: a.length };
+    const e = a.map(t => t.err), m = mean(e), side = Math.abs(m) >= th ? (m > 0 ? '右' : '左') : null;
+    return { ok: true, n: a.length, mean: r1(m), sd: r1(sd(e)), each: e, side, th, redo: sd(e) > SVV_SD || a.length < 3 }; };
+  const V = one('V', SVV_TH), H = one('H', SVH_TH);
+  Object.assign(RUN, { ok: V.ok || H.ok, V, H, trials: T, ended: new Date().toISOString() });
+  if (!RUN.ok) { showScreen('s1'); return note(T.filter(t => t.ok && t.off).length >= 4 ? '線が大きくずれたまま止まる回が続きました。急にめまいやふらつきが出ている方は、このアプリではなく医療機関を受診してください' : '線を合わせたところを読み取れませんでした。もう一度どうぞ'); }
+  const n = saveRun();
+  showScreen('s2'); say('記録しました');
+  $('endCust').classList.toggle('hide', STAFF); $('endCustNote').classList.toggle('hide', STAFF); $('endStaff').classList.toggle('hide', !STAFF);
+  const cust = (o, nm, end, dir) => !o.ok ? `<div class="res"><b>${nm}</b>：うまく読み取れませんでした（合わせられた回 ${o.n}）</div>`
+    : `<div class="res"><b>${nm}</b>：${Math.abs(o.mean) < 0.05 ? 'ずれ 0.0°' : `${end}が<b>${o.mean > 0 ? dir[0] : dir[1]}へ ${Math.abs(o.mean).toFixed(1)}°</b>`}<br>${o.redo ? `<b style="color:var(--red)">測り直してください</b>（1回ごとの値のばらつきが大きく、この平均はあてになりません）` : o.side ? `<b style="color:var(--red)">目安（${o.th}°未満）を超えるずれ</b>` : `目安（${o.th}°未満）の範囲内`}</div>`;
+  const redo = (V.ok && V.redo) || (H.ok && H.redo);
+  const offN = T.filter(t => t.ok && t.off).length, ngN = T.filter(t => !t.ok).length;
+  // 意味は「どの感覚がずれていそうか」まで。SVV で測っていないこと（心の傾き・性格など）は書かない（2026-10-28 宮崎さん）
+  // 赤枠は2通り：平均が SVV_BIG 以上か、10°以上外れた回が2回以上（このときは平均が小さく見えても「ほぼそろっています」は出さない）
+  const bigMean = [V, H].some(o => o.ok && Math.abs(o.mean) >= SVV_BIG), bigOff = offN >= 2, off = [V, H].some(o => o.ok && o.side && !o.redo);
+  const mean1 = redo || bigOff ? '' : `<p>${off ? '頭の中の「まっすぐ」が、本当の重力の向きから少しずれています。「まっすぐ」は、耳の奥の重力を感じる器官を中心に、目や首・体の感覚も合わせて脳が作っています。その左右差の手がかりの一つです（これだけで、どこかは決まりません）'
+    : '頭の中の「まっすぐ」が、本当の重力の向きとほぼそろっています'}</p>`;
+  const bigBox = bigMean || bigOff ? `<div class="res" style="border-color:var(--red)"><b style="color:var(--red)">${bigMean ? 'ずれがとても大きく出ました' : `線が大きくずれたまま止まる回がありました（${offN}回。平均には入れていません）`}</b><br>強いめまい・ふらつき・吐き気・急な聞こえの変化がある方は、このアプリではなく<b>医療機関（耳鼻科・神経内科）</b>を受診してください。思い当たることがなければ、頭をまっすぐにして測り直してください</div>` : '';
+  const proLink = `<a class="btn sub" href="pro.html">プロの方へ：このズレをお客さんでどう読むか</a>`;
+  $('endCust').textContent = TRAIN ? '結果（トレーニング）' : '結果';
+  $('endCustNote').innerHTML = (TRAIN ? `<p class="small">見本の線が出る前（各回の3.5〜5秒）の、自分で合わせたずれです</p>` : '') + tiltLine(RUN.tilt) + cust(V, '縦（SVV）', '線の上の端', ['右', '左']) + cust(H, '横（SVH）', '線の右の端', ['下', '上']) + bigBox + mean1 +
+    (redo ? `<p class="small"><b>測り直すときは</b>：頭は動かさず、スマホだけを回して合わせてください。合わせたら10秒が終わるまで止めたままにします</p>` : '') +
+    `<p class="small">同じ条件（部屋の明るさ・持ち方・頭をまっすぐ）でくり返して比べる目安です。診断ではありません。急にめまいが出た方は医療機関へ。<a href="about.html">このテストについて</a></p>` + proLink;
+  if (!STAFF) return;
+  const row = (o, nm, end) => !o.ok ? `${nm}：読み取れず（合わせられた回 ${o.n}）` : `${nm}：平均 <b>${o.mean > 0 ? '右' : '左'}へ ${Math.abs(o.mean).toFixed(1)}°</b>（${o.each.map(e => (e > 0 ? '+' : '') + e.toFixed(1)).join('・')}・ばらつき ±${o.sd}°）${end}${o.redo ? ` <b style="color:var(--red)">→ 測り直し（ばらつき ±${SVV_SD}° 超か、合わせられた回が3回未満）</b>` : ''}`;
+  const rd = (o, nm, organ, end) => o.ok && o.side && !o.redo ? `<br><b>${o.side}の耳石（${organ}寄り）</b>の働き低下の可能性 — ${nm}で${end}が${o.side}へ平均 ${Math.abs(o.mean).toFixed(1)}°（${o.th}°以上で異常）` : '';
+  const jv = rd(V, '縦（SVV）', '球形嚢', '線の上の端'), jh = rd(H, '横（SVH）', '卵形嚢', '下がった端');
+  $('endStaff').innerHTML = `<div class="done">結果（スタッフ用${TRAIN ? '・トレーニング' : ''}）</div>
+  ${tiltLine(RUN.tilt)}<div class="res">${row(V, '縦（SVV）', '（＋＝上の端が右）')}<br>${row(H, '横（SVH）', '（＋＝右の端が下）')}${offN || ngN ? `<br><span class="small">平均から外した回：10°以上外れた ${offN}回・読み取れなかった ${ngN}回</span>` : ''}</div>
+  <div class="res judge">内部の読み（仮）：${jv || jh ? jv + jh : ''}${redo ? '<br><b style="color:var(--red)">測り直し</b>（ばらつきが大きい側は読まない）' : jv || jh ? '' : '<br>縦・横とも正常の範囲'}<br><span class="small">SVV は 2.5°以上・SVH は 1.5°以上で異常。SVV は線の上の端が、SVH は下がった端が、働きの落ちた耳石の側を向く。SVV＝球形嚢寄り・SVH＝卵形嚢寄り（目安）。延髄・橋なら同じ側、小脳・中脳より上なら反対側へ傾くことが多い（Vestibular Rehabilitation 印刷頁190）。本来は暗室かバケツで周りを隠して測る。スマホだけでは周りの縦横が見えるので、数字は仮</span></div>
+  ${bigBox}<textarea id="endText" readonly></textarea><button class="btn sub" id="bCopy">この結果をコピー</button>
+  <p class="small">この端末に残っている記録：${n}件</p>${proLink}`;
+  const one2 = (o, nm) => o.ok ? `${nm} 平均${o.mean > 0 ? '右' : '左'}へ${Math.abs(o.mean).toFixed(1)}°（${o.each.map(e => (e > 0 ? '+' : '') + e.toFixed(1)).join('・')}）` : `${nm} —`;
+  $('endText').value = `SVV テスト${TRAIN ? '・トレーニング' : ''}（${RUN.ended.slice(0, 16).replace('T', ' ')}）\n${one2(V, '縦（SVV）')}／${one2(H, '横（SVH）')}（＋＝時計回り＝本人の右）\n${RUN.tilt ? `首の傾き：${tiltWord(RUN.tilt.deg)}（ぶれ ±${RUN.tilt.sd}°・口角の線 ${tiltWord(RUN.tilt.mouthDeg)}・スマホの傾き ${RUN.tilt.phone ?? '—'}°）${RUN.tilt.note ? '／' + RUN.tilt.note : ''}\n` : ''}内部の読み（仮）：${[redo ? '測り直し' : '', V.ok && V.side && !V.redo ? V.side + 'の耳石（SVV）' : '', H.ok && H.side && !H.redo ? H.side + 'の耳石（SVH）' : ''].filter(Boolean).join('・') || '正常の範囲'}\n\n` + JSON.stringify(RUN);
+  $('bCopy').onclick = () => copyText($('endText').value, $('bCopy'));
+}
+function saveRun() { try { const a = JSON.parse(localStorage.getItem('svv_runs') || '[]'); a.push(RUN); while (a.length > 30) a.shift(); localStorage.setItem('svv_runs', JSON.stringify(a)); return a.length; } catch (e) { return 0; } }
+async function copyText(t, b) { let ok = false; try { await navigator.clipboard.writeText(t); ok = true; } catch (e) { const a = $('endText'); if (a) { a.value = t; a.select(); try { ok = document.execCommand('copy'); } catch (_) {} } } b.textContent = ok ? 'コピーしました' : '上の枠を長押しでコピー'; }
+
+$('bTiltGo').onclick = () => stepSvv(false, true);
+$('bGo').onclick = () => stepSvv(false);
+$('bTrain').onclick = () => stepSvv(true);
+$('bAgain').onclick = () => { showScreen('s1'); stepSvv(TRAIN, WITH_TILT); };
+$('svvStop').onclick = () => { tok++; svvShow(false); showScreen('s1'); btnsOff(false); note(''); };
+$('tiltStop').onclick = () => { tok++; camStop(); tiltShow(false); showScreen('s1'); btnsOff(false); note(''); };
+$('tapStart').onclick = () => {
+  try { VA.muted = false; VA.src = 'voice/unlock.mp3'; VA.play().catch(() => {}); } catch (e) {}
+  $('splash').classList.add('hide'); $('app').setAttribute('aria-hidden', 'false'); showScreen('s1');
+};
+
+// ── サイドメニュー（モーダルでない・ESC で閉じる）
+function menu(open) { $('side').classList.toggle('open', open); $('overlay').classList.toggle('open', open); $('side').setAttribute('aria-hidden', open ? 'false' : 'true');
+  if (open && STAFF) { let n = 0; try { n = JSON.parse(localStorage.getItem('svv_runs') || '[]').length; } catch (e) {} $('runCount').textContent = `この端末に残っている記録：${n}件`; } }
+$('menuBtn').onclick = () => menu(true); $('closeMenu').onclick = () => menu(false); $('overlay').onclick = () => menu(false);
+addEventListener('keydown', e => { if (e.key === 'Escape') menu(false); });
+if (STAFF) { $('staffTag').classList.remove('hide'); $('staffSide').classList.remove('hide'); }
+$('bCopyAll').onclick = () => copyText(localStorage.getItem('svv_runs') || '[]', $('bCopyAll'));
+window.__svv = { analyzeSvv, svvTrial, stepSvv, tiltCheck, get RUN() { return RUN; } };   // 確かめ用
+
+if ('serviceWorker' in navigator) {
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (refreshing) return; refreshing = true;   // 測っている最中は読み込み直さない（終わってから）
+    const go = () => document.body.classList.contains('playing') ? setTimeout(go, 2000) : location.reload(); go(); });
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(err => console.warn('[SW] register failed', err)));
+}
+</script>
+</body>
+</html>

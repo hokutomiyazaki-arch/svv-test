@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="SVV テストの結果を、お客さんの体でどう読むか。体の仕事をしている人向けの無料解説。傾く向きの読み方、ほかのチェックとの突き合わせ、前後の比べ方、医療機関へつなぐ目安。" />
+<title>プロの方へ：SVV のズレをお客さんでどう読むか / Functional Neuro Training</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  /* 解説ページ。配色は index.html と同じ白（2026-10-16 宮崎さん：黒だと画面に顔が映り込むので白に） */
+  :root{ --bg:#fff; --bg1:#f6f6f7; --ink:#111113; --muted:#5f5f66; --line:rgba(0,0,0,.12); --card:rgba(0,0,0,.035); --red:#d32020; }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:"M PLUS Rounded 1c", system-ui, sans-serif; font-weight:500; color:var(--ink); background:var(--bg); line-height:1.9;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+  .wrap{ max-width:680px; margin:0 auto; padding:16px 20px 40px; }
+  .back{ display:inline-block; margin:6px 0 18px; padding:8px 16px; border-radius:12px; background:var(--card); border:1px solid var(--line); color:var(--ink); text-decoration:none; font-weight:700; font-size:14px; }
+  .kicker{ font-size:12px; letter-spacing:.2em; color:var(--red); font-weight:700; }
+  h1{ font-size:27px; font-weight:800; line-height:1.45; margin:6px 0 10px; }
+  .lead{ color:var(--muted); font-size:15px; }
+  h2{ font-size:20px; font-weight:800; margin:38px 0 12px; padding-top:18px; border-top:1px solid var(--line); }
+  h2 .no{ color:var(--red); margin-right:8px; }
+  h3{ font-size:16px; font-weight:800; margin:20px 0 6px; }
+  p{ margin:8px 0; font-size:15px; }
+  ul, ol{ margin:8px 0 8px 1.3em; font-size:15px; }
+  li{ margin:5px 0; }
+  b{ font-weight:800; }
+  .card{ margin:14px 0; padding:14px 16px; border-radius:14px; background:var(--card); border:1px solid var(--line); }
+  .key{ border-color:rgba(226,72,61,.55); }
+  table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:14px; }
+  th, td{ text-align:left; vertical-align:top; padding:9px 8px; border-bottom:1px solid var(--line); }
+  th{ color:var(--muted); font-weight:700; font-size:12.5px; }
+  .src{ font-size:12px; color:var(--muted); line-height:1.7; margin-top:4px; }
+  .refs{ font-size:12.5px; color:var(--muted); line-height:1.75; }
+  .refs li{ margin:6px 0; }
+  .refs a{ color:#3a3a40; }
+  .note{ font-size:12px; color:var(--muted); }
+  footer{ margin-top:40px; padding-top:18px; border-top:1px solid var(--line); text-align:center; }
+  .med{ font-size:11.5px; color:var(--muted); line-height:1.75; text-align:left; }
+  .copy{ display:block; margin-top:14px; font-size:11px; letter-spacing:.14em; color:var(--muted); }
+  .red{ border-color:rgba(211,32,32,.6); background:rgba(211,32,32,.05); }
+  .learn{ display:block; margin:12px 0; padding:14px 16px; border-radius:14px; background:var(--ink); color:#fff; text-decoration:none; font-weight:800; text-align:center; }
+</style>
+</head>
+<body>
+<!-- プロ向けの無料解説（2026-10-28 宮崎さん：アンケートのプレゼントの SVV テストから、プロの方を「このズレをお客さんでどう読むか」へ案内する。値段は出さない）。
+     中身は about.html と、アドバンスの SVV スライド（~/dev/fnt-koshu-ops/courses/2026-10-25_アドバンス/施策/SVV/build.py）に合わせる。どちらかを直したらここも見る。
+     SVV で測っていないこと（心の傾き・性格など）は書かない。講座の名前・値段は出さない -->
+<div class="wrap">
+  <a class="back" href="./">← SVV テストへ戻る</a>
+  <div class="kicker">FOR PROFESSIONALS</div>
+  <h1>プロの方へ<br>このズレを、お客さんでどう読むか</h1>
+  <p class="lead">トレーナー・治療家など、体の仕事をしている方向けの解説です。SVV テストの数字を、お客さんの体の見立てにどう使うか。根拠は<a href="about.html">このテストについて</a>の論文と教科書です。</p>
+
+  <div class="card key">
+    <p><b>ひとことで言うと</b>：SVV のズレは、耳の奥の重力を感じる器官（耳石器）から脳までの道の「左右差」の手がかりの一つです。<b>1回の数字で決めず、ほかのチェックと同じ側を指すかを見て、同じ条件で前後を比べる</b>のが使い方です。</p>
+  </div>
+
+  <h2><span class="no">1</span>まず、医療機関へつなぐ人を分ける</h2>
+  <div class="card red">
+    <ul>
+      <li><b>強いめまい・ふらつき・吐き気・急な聞こえの変化</b>があるお客さんは、トレーニングの前に医療機関（耳鼻科・神経内科）の受診をすすめてください</li>
+      <li>症状が無くても、平均のズレが <b>5° 以上</b>か、10° 以上外れた回が続くときは、頭をまっすぐ・部屋を暗くして測り直します。それでも大きく出て、急なめまいなど思い当たることがあれば、受診をすすめてください</li>
+    </ul>
+    <p class="note">急性の病気では、SVV が大きく傾きます（前庭神経炎で約 7°、延髄外側の梗塞で約 9.8°。前庭神経炎の急性期には 20° を超えることも）。ずれが大きいほど急性、と教科書は書いています。（Cnyrim ら 2007／Vestibular Rehabilitation 12章）　5° はこのアプリで決めた目安です。</p>
+  </div>
+
+  <h2><span class="no">2</span>傾く向きの読み方</h2>
+  <p>耳（耳石）の側の問題なら、<b>SVV は線の上の端が</b>、<b>SVH は下がった端が</b>、働きの落ちた側を向きます。アプリの数字は、本人から見て時計回りが＋です（縦の線なら上の端が右へ、横の線なら右の端が下へ傾いたとき）。</p>
+  <p>ただし、<b>向きだけでは「どちらの、どこか」は決まりません</b>。</p>
+  <table>
+    <tr><th>弱っている場所</th><th>線の傾く向き</th></tr>
+    <tr><td>耳（迷路・前庭神経）／延髄〜橋の下部</td><td>同じ側へ</td></tr>
+    <tr><td>橋の上部〜中脳</td><td>反対側へ</td></tr>
+    <tr><td>小脳</td><td>反対側が多い（約60%）</td></tr>
+    <tr><td>視床</td><td>中くらい。同じ側も反対側もある</td></tr>
+    <tr><td>頭頂島前庭皮質（大脳）</td><td>中くらい。多くは反対側</td></tr>
+  </table>
+  <p class="src">重力の道が橋のあたりで左右に交わるため、その上と下で向きが逆になります。（Brandt & Dieterich 1994・Dieterich & Brandt 1993・Baier ら 2012／Vestibular Rehabilitation 5章・11章）</p>
+  <p>アプリの「縦＝球形嚢寄り・横＝卵形嚢寄り」も目安です。教科書は「この検査で球形嚢か卵形嚢かは分けられない」としています。（Vestibular Rehabilitation 11章 p.189・Cheng ら 2022）</p>
+
+  <h2><span class="no">3</span>ほかのチェックと突き合わせる</h2>
+  <p>SVV の傾きは、<b>頭の傾き・眼のねじれ・斜位（左右の目の上下のずれ）</b>と同じ「ロール面（頭を左右に倒す向き）の左右差」のサインで、向きもそろって出やすいものです。（Brandt & Dieterich 1994）</p>
+  <ul>
+    <li>アプリの「首の傾きチェック → SVV」で、ふだんの首の傾きと SVV のズレが<b>同じ側を指すか</b>を見る。🔴 SVV は<b>頭をまっすぐに直してから</b>測る（頭が傾いたまま測ると、その傾きだけで SVV が同じ側へずれる。4章）</li>
+    <li>目の高さ・斜位（カバーテスト）など、ほかの左右差のチェックとも<b>同じ側を指すか</b>を見る</li>
+    <li>そろって同じ側を指すほど、その側の左右差の見立てに自信が持てます。バラバラなら、SVV だけで決めない</li>
+  </ul>
+
+  <h2><span class="no">4</span>数字を動かしてしまうもの（測る前にそろえる）</h2>
+  <ul>
+    <li><b>頭の傾き</b>：頭を右に 30° 傾けるだけで約 10° ずれました。測るときは頭をまっすぐに。（Wang ら 2021）</li>
+    <li><b>周りの景色</b>：首の痛みが続く人は、傾いた枠が見えると誤差が広がりました。部屋を暗く、画面を顔に近づける。（Docherty ら 2012）</li>
+    <li><b>首・体の感覚</b>：片側の前庭障害（前庭神経鞘腫）の人で、首の後ろの筋肉への振動でずれが大きくなりました（Kawase ら 2011）。両側の前庭の働きが落ちた人では、視覚や首・体の感覚の影響が強まっていました（Toupet ら 2017）。首へのアプローチの前後で比べる材料にもなります</li>
+    <li><b>測り方</b>：「測り直してください」と出たら、頭は動かさずスマホだけを回して合わせ、10秒止めたままにしてもう一度</li>
+  </ul>
+
+  <h2><span class="no">5</span>前後を比べる</h2>
+  <ol>
+    <li>条件をそろえる：部屋の暗さ・座り方・持ち方・頭まっすぐ</li>
+    <li>SVV テストを1回（約2分）。ズレの大きさと向きを記録する</li>
+    <li>アプローチのあと、<b>同じ条件でもう一度</b>測る</li>
+  </ol>
+  <p>測るたびに数字はぶれます。「本当に変わった」と言える差は、スマホを固定した方式で健康な人 0.52°・患者 1.36°、VR 方式で 2.67° でした。<b>その幅より大きく変わったか</b>で読みます。このアプリは手に持つ方式なので、ぶれはそれ以上と考えてください。（Riera-Tur ら 2023・Ogihara ら 2025）</p>
+  <p class="note">研究：前庭神経炎の人の前庭リハビリでは、体の揺れの回復は早まりましたが、SVV の戻り方は運動の有無で同じでした（Strupp ら 1998）。急なめまいのあとの SVV のずれは、数日〜数か月で脳の代償によって戻ることが多いので、週・月をまたいだ変化はそのまま「アプローチの効果」とは言い切れません。同じ日の前後の差は、上の「測るたびのぶれ」の幅と比べて読みます。</p>
+
+  <h2><span class="no">6</span>このアプリの限界</h2>
+  <ul>
+    <li>手に持ったスマホで線を合わせる方式です。この方式そのものの精度を調べた研究は、まだ見つかっていません（2026年10月時点）</li>
+    <li>暗室やバケツほど、周りの縦横の手がかりを消せません。境目（SVV 2.5°・SVH 1.5°）はアプリの決まりで、この方式で確かめた数字ではありません</li>
+    <li>だから、お客さんには<b>診断ではなく「同じ条件でくり返して比べる目安」</b>として伝えてください</li>
+  </ul>
+
+  <h2><span class="no">7</span>もっと学びたい方へ</h2>
+  <p>SVV を含む、目・耳・首の感覚から体を見立てる方法は、Functional Neuro Training のプロ向けのカリキュラムで、実技と一緒に詳しく扱っています。</p>
+  <a class="learn" href="https://bodydiscovery.info/owned-optin" target="_blank" rel="noopener">もっと学びたい方へ（無料）</a>
+
+  <footer>
+    <p class="med">このアプリは体を整えるためのセルフチェックで、医療行為ではありません。診断や治療の代わりにはなりません。強いめまい・ふらつき・吐き気・急な聞こえの変化があるときは医療機関を受診してください。気分が悪くなったら、すぐにやめてください。</p>
+    <a class="back" href="./" style="margin-top:18px">← SVV テストへ戻る</a>
+    <span class="copy">© Functional Neuro Training / Legrandchariot</span>
+  </footer>
+</div>
+</body>
+</html>
