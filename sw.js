@@ -2,7 +2,7 @@
 // 戦略：Network First（新しいコードを最優先で拾う）。オフライン時のみキャッシュへ。
 // 同じサイトの取得は cache:'no-cache'（GitHub Pages は max-age=600 なので、そのままだと公開から10分は古い版がブラウザから返る。2026-10-16 iPad で直した前の文が残って見えた）。
 // index.html 側で controllerchange を検知して読み込み直す（測っている最中は待つ）。
-const CACHE_NAME = 'svv-test-v1.0.0';
+const CACHE_NAME = 'svv-test-v1.0.1';
 const ASSETS_TO_CACHE = ['./', './index.html', './about.html', './pro.html', './manifest.json', './FNT512.png', './FNT512-transparent.png', './voice/index.json',
   'https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap'];
 

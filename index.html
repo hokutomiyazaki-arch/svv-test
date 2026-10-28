@@ -232,6 +232,23 @@ if (!onPhone && !asApp && matchMedia('(pointer:fine)').matches) document.getElem
 //   カメラを使うのはこの5秒だけで、SVV に入る前に手放す（SVV はこれまでどおりカメラなし）
 const $ = id => document.getElementById(id);
 const STAFF = /[?&]staff\b/.test(location.search);
+// 「前庭器官をもっと学びたい」（2026-10-28 宮崎さん）：アンケートの完了画面・プレゼントのメールから開くと ?v=<本人の印> が付く。
+// 端末に覚えて URL からは消す（人に URL を送っても印が渡らないように）。印がある人だけ、押すと Kit に知らせて案内をメールで送る。
+// 印が無い人（ほかから開いた人）は、前庭器官マスターマニュアルのページを開くだけ（知らないアドレスに売り込みを送らない）
+const VT = (() => { try { const v = new URLSearchParams(location.search).get('v'); if (v) { localStorage.setItem('fnt_vt', v); const u = new URL(location.href); u.searchParams.delete('v'); history.replaceState(null, '', u.pathname + u.search + u.hash); } return localStorage.getItem('fnt_vt') || ''; } catch (e) { return ''; } })();
+const vesBtn = () => VT ? `<button class="btn" data-ves="1">前庭器官をもっと学びたい</button><p class="small" data-vesmsg="1"></p>`
+  : `<a class="btn" href="https://go.functional-neuro-training.com/pro-lecture" target="_blank" rel="noopener">前庭器官をもっと学びたい</a>`;
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-ves]'); if (!b) return;
+  const m = b.parentNode.querySelector('[data-vesmsg]'); b.disabled = true; b.textContent = '送っています…';
+  try {
+    const r = await fetch('https://go.functional-neuro-training.com/api/survey', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind: 'ves', vt: VT }) });
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || 'ng');
+    b.textContent = '受け付けました';
+    m.innerHTML = j.mailed ? '<b>ご登録のメールアドレスに、前庭器官の講義とドリルのご案内をお送りしました。</b>'
+      : j.member ? '前庭器官の講義とドリルは、BODY DISCOVERY COLLEGE のプロカリキュラムでご覧いただけます。' : 'ありがとうございます！';
+  } catch (err) { b.disabled = false; b.textContent = '前庭器官をもっと学びたい'; m.textContent = 'うまく送れませんでした。電波のよいところで、もう一度押してください'; }
+});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const mean = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : NaN;
 const med = a => { if (!a.length) return NaN; const v = [...a].sort((x, y) => x - y), n = v.length >> 1; return v.length % 2 ? v[n] : (v[n - 1] + v[n]) / 2; };
@@ -627,7 +644,7 @@ function analyzeSvv(T) {
   $('endCust').textContent = TRAIN ? '結果（トレーニング）' : '結果';
   $('endCustNote').innerHTML = (TRAIN ? `<p class="small">見本の線が出る前（各回の3.5〜5秒）の、自分で合わせたずれです</p>` : '') + tiltLine(RUN.tilt) + cust(V, '縦（SVV）', '線の上の端', ['右', '左']) + cust(H, '横（SVH）', '線の右の端', ['下', '上']) + bigBox + mean1 +
     (redo ? `<p class="small"><b>測り直すときは</b>：頭は動かさず、スマホだけを回して合わせてください。合わせたら10秒が終わるまで止めたままにします</p>` : '') +
-    `<p class="small">同じ条件（部屋の明るさ・持ち方・頭をまっすぐ）でくり返して比べる目安です。診断ではありません。急にめまいが出た方は医療機関へ。<a href="about.html">このテストについて</a></p>` + proLink;
+    `<p class="small">同じ条件（部屋の明るさ・持ち方・頭をまっすぐ）でくり返して比べる目安です。診断ではありません。急にめまいが出た方は医療機関へ。<a href="about.html">このテストについて</a></p>` + proLink + vesBtn();
   if (!STAFF) return;
   const row = (o, nm, end) => !o.ok ? `${nm}：読み取れず（合わせられた回 ${o.n}）` : `${nm}：平均 <b>${o.mean > 0 ? '右' : '左'}へ ${Math.abs(o.mean).toFixed(1)}°</b>（${o.each.map(e => (e > 0 ? '+' : '') + e.toFixed(1)).join('・')}・ばらつき ±${o.sd}°）${end}${o.redo ? ` <b style="color:var(--red)">→ 測り直し（ばらつき ±${SVV_SD}° 超か、合わせられた回が3回未満）</b>` : ''}`;
   const rd = (o, nm, organ, end) => o.ok && o.side && !o.redo ? `<br><b>${o.side}の耳石（${organ}寄り）</b>の働き低下の可能性 — ${nm}で${end}が${o.side}へ平均 ${Math.abs(o.mean).toFixed(1)}°（${o.th}°以上で異常）` : '';
@@ -636,7 +653,7 @@ function analyzeSvv(T) {
   ${tiltLine(RUN.tilt)}<div class="res">${row(V, '縦（SVV）', '（＋＝上の端が右）')}<br>${row(H, '横（SVH）', '（＋＝右の端が下）')}${offN || ngN ? `<br><span class="small">平均から外した回：10°以上外れた ${offN}回・読み取れなかった ${ngN}回</span>` : ''}</div>
   <div class="res judge">内部の読み（仮）：${jv || jh ? jv + jh : ''}${redo ? '<br><b style="color:var(--red)">測り直し</b>（ばらつきが大きい側は読まない）' : jv || jh ? '' : '<br>縦・横とも正常の範囲'}<br><span class="small">SVV は 2.5°以上・SVH は 1.5°以上で異常。SVV は線の上の端が、SVH は下がった端が、働きの落ちた耳石の側を向く。SVV＝球形嚢寄り・SVH＝卵形嚢寄り（目安）。延髄・橋なら同じ側、小脳・中脳より上なら反対側へ傾くことが多い（Vestibular Rehabilitation 印刷頁190）。本来は暗室かバケツで周りを隠して測る。スマホだけでは周りの縦横が見えるので、数字は仮</span></div>
   ${bigBox}<textarea id="endText" readonly></textarea><button class="btn sub" id="bCopy">この結果をコピー</button>
-  <p class="small">この端末に残っている記録：${n}件</p>${proLink}`;
+  <p class="small">この端末に残っている記録：${n}件</p>${proLink}${vesBtn()}`;
   const one2 = (o, nm) => o.ok ? `${nm} 平均${o.mean > 0 ? '右' : '左'}へ${Math.abs(o.mean).toFixed(1)}°（${o.each.map(e => (e > 0 ? '+' : '') + e.toFixed(1)).join('・')}）` : `${nm} —`;
   $('endText').value = `SVV テスト${TRAIN ? '・トレーニング' : ''}（${RUN.ended.slice(0, 16).replace('T', ' ')}）\n${one2(V, '縦（SVV）')}／${one2(H, '横（SVH）')}（＋＝時計回り＝本人の右）\n${RUN.tilt ? `首の傾き：${tiltWord(RUN.tilt.deg)}（ぶれ ±${RUN.tilt.sd}°・口角の線 ${tiltWord(RUN.tilt.mouthDeg)}・スマホの傾き ${RUN.tilt.phone ?? '—'}°）${RUN.tilt.note ? '／' + RUN.tilt.note : ''}\n` : ''}内部の読み（仮）：${[redo ? '測り直し' : '', V.ok && V.side && !V.redo ? V.side + 'の耳石（SVV）' : '', H.ok && H.side && !H.redo ? H.side + 'の耳石（SVH）' : ''].filter(Boolean).join('・') || '正常の範囲'}\n\n` + JSON.stringify(RUN);
   $('bCopy').onclick = () => copyText($('endText').value, $('bCopy'));
