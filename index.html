@@ -78,6 +78,10 @@
   #svv canvas{ position:absolute; inset:0; width:100%; height:100%; }
   #svvMsg{ position:absolute; left:50%; top:18%; transform:translateX(-50%); width:min(92vw,520px); text-align:center; font-weight:800; font-size:clamp(22px,6vw,30px); line-height:1.45; color:#222; }
   #svvMsg small{ display:block; font-size:15px; font-weight:600; color:#666; margin-top:6px; }
+  body[data-col=white] #svv{ background:#000; } body[data-col=white] #svvMsg{ color:#eee; } body[data-col=white] #svvMsg small{ color:#aaa; }
+  body[data-col=white] #svvStop{ background:#1a1a1c; color:#888; border-color:#333; }
+  .colPick{ display:flex; gap:8px; margin:14px 0 4px; } .colPick button{ flex:1; min-height:46px; border-radius:12px; background:var(--card); color:var(--ink); border:1px solid var(--line); font-size:14px; }
+  .colPick button.on{ background:var(--accent); color:var(--accentInk); border-color:var(--accent); }
   #svvStop{ position:absolute; right:calc(14px + env(safe-area-inset-right)); bottom:calc(14px + env(safe-area-inset-bottom)); padding:8px 14px; border-radius:10px; background:#f2f2f3; color:#888; font-size:13px; border:1px solid #e2e2e4; }
 
   /* 首の傾きチェック：前のカメラで顔を映す（SVV の前にやる。2026-10-24） */
@@ -145,13 +149,15 @@
   <main>
     <section class="screen" id="s1">
       <div class="step-label">線をまっすぐにする</div>
-      <h2>赤い線を<br>まっすぐ縦・まっすぐ横に</h2>
+      <h2>線を<br>まっすぐ縦・まっすぐ横に</h2>
       <ul class="setupList">
         <li><span class="no">1</span><span>部屋を<b>暗く</b>できれば暗くする</span></li>
         <li><span class="no">2</span><span>スマホを<b>縦に</b>持って、<b>顔にできるだけ近づける</b>（画面で見える範囲がほぼ埋まるくらい・鼻から10〜15cm）</span></li>
-        <li><span class="no">3</span><span>赤い線が出たら、スマホを<b>傾けて</b>線を合わせ、そのまま止める（1回10秒）</span></li>
+        <li><span class="no">3</span><span>線が出たら、スマホを<b>傾けて</b>線を合わせ、そのまま止める（1回10秒）</span></li>
         <li><span class="no">4</span><span>縦を4回、横を4回。全部で約2分</span></li>
       </ul>
+      <div class="step-label" style="margin-top:16px">線の色</div>
+      <div class="colPick" id="colPick"><button data-col="red">赤（白地）</button><button data-col="black">黒（白地）</button><button data-col="white">白（黒地）</button></div>
       <div class="msg" id="msg"></div>
       <button class="btn" id="bTiltGo">首の傾きチェック → SVV</button>
       <p class="small">はじめに前のカメラで5秒、楽にした姿勢のまま画面を見て、ふだんの首の傾き（目じりを結んだ線）を測ります。続けて SVV に進みます</p>
@@ -546,6 +552,11 @@ const SVV_TH = 2.5, SVH_TH = 1.5, SVV_N = 4, SVV_SEC = 10, SVV_TAIL = 1500, SVV_
 //   手持ちだとスマホと一緒に頭が傾く・始めの傾きとスマホの縁につられる、で1回ごとの値が揺れ、4回の平均では片側へのずれに見えてしまうため。3° は仮の値（講習で使って見直す）
 function svvShow(on) { $('svv').style.display = on ? 'block' : 'none'; document.body.classList.toggle('playing', on); on ? wakeOn() : wakeOff(); if (!on) svvMsg(''); }
 function svvMsg(html) { $('svvMsg').innerHTML = html; if (html) say(html); }
+// 線の色（2026-11-02 宮崎さん「線の色を黒に・黒背景に白も」）：赤（白地・既定）／黒（白地）／白（黒地）。端末に覚えておく
+const COLS = { red: '#d32020', black: '#111', white: '#fff' };
+let COL = COLS[localStorage.getItem('svvColor')] ? localStorage.getItem('svvColor') : 'red';
+function setCol(c) { COL = c; localStorage.setItem('svvColor', c); document.body.dataset.col = c; document.querySelectorAll('#colPick button').forEach(b => b.classList.toggle('on', b.dataset.col === c)); }
+document.querySelectorAll('#colPick button').forEach(b => b.onclick = () => setCol(b.dataset.col)); setCol(COL);
 function svvLine(kind, deg, guide) {   // deg：画面に対する線の傾き（＋＝時計回り）／guide：見本（本当の縦・横）の画面に対する角度。無ければ出さない
   const c = $('svvC'), w = c.clientWidth, h = c.clientHeight, x = c.getContext('2d'), k = devicePixelRatio || 1;
   c.width = w * k; c.height = h * k; x.setTransform(k, 0, 0, k, 0, 0); x.clearRect(0, 0, w, h);
@@ -554,12 +565,12 @@ function svvLine(kind, deg, guide) {   // deg：画面に対する線の傾き�
   const L = Math.hypot(w, h) / 2 + 10;   // 画面の端から端まで貫く（2026-10-15 宮崎さん）
   x.translate(w / 2, h / 2);
   if (guide != null) {   // 見本は赤い線の下に、薄い灰色で
-    x.save(); x.rotate(guide * Math.PI / 180); x.strokeStyle = 'rgba(0,0,0,.2)'; x.lineWidth = 3; x.beginPath();
+    x.save(); x.rotate(guide * Math.PI / 180); x.strokeStyle = COL === 'white' ? 'rgba(255,255,255,.3)' : 'rgba(0,0,0,.2)'; x.lineWidth = 3; x.beginPath();
     if (kind === 'V') { x.moveTo(0, -L); x.lineTo(0, L); } else { x.moveTo(-L, 0); x.lineTo(L, 0); }
     x.stroke(); x.restore();
   }
   x.rotate(deg * Math.PI / 180);
-  x.strokeStyle = '#d32020'; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath();
+  x.strokeStyle = COLS[COL]; x.lineWidth = 5; x.lineCap = 'round'; x.beginPath();
   if (kind === 'V') { x.moveTo(0, -L); x.lineTo(0, L); } else { x.moveTo(-L, 0); x.lineTo(L, 0); }
   x.stroke();
 }
@@ -601,7 +612,7 @@ async function stepSvv(train, withTilt) {
     note('');
     let tilt = null;
     if (WITH_TILT) { tilt = await tiltCheck(my); if (my !== tok || !tilt) return; if (tilt.err) return note(tilt.err); await sleep(600); if (my !== tok) return; }
-    RUN = { started: new Date().toISOString(), ua: navigator.userAgent, mode: TRAIN ? 'train' : 'test', tilt };
+    RUN = { started: new Date().toISOString(), ua: navigator.userAgent, mode: TRAIN ? 'train' : 'test', color: COL, tilt };
     const plan = [];   // 縦4・横4。始めの傾きは右・左を交互に（最初の向きはばらばら）、大きさは 12〜20° でばらばら
     for (const kind of ['V', 'H']) { const s0 = Math.random() < 0.5 ? 1 : -1; for (let i = 0; i < SVV_N; i++) plan.push({ kind, start: (i % 2 ? -s0 : s0) * (12 + Math.random() * 8) }); }
     svvShow(true); const T = [];
